@@ -12,8 +12,7 @@ const CardCom = ({ icon, title, data, info, indicator, indiInfo }) => {
                     </div>
                     <div className='d-flex gap-1 align-items-center'>
                         {indicator ? indicator : ""}
-                        <span style={{color: "red"}}>{indiInfo ? indiInfo : '0'}</span>
-                        {/* {indiInfo ? indiInfo : ""} */}
+                        <h4>{indiInfo}</h4>
                     </div>
 
                 </div>

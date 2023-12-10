@@ -57,7 +57,7 @@ export const DetailAnalytics = () => {
                     orders: res?.data?.count ? res.data.count : "2"
                 }
 
-                setReportData({...updateData})
+                setReportData({ ...updateData })
 
                 setIsLoading(false)
             })
@@ -80,19 +80,19 @@ export const DetailAnalytics = () => {
                         <CardBody>
                             <div className='d-flex justify-content-between align-items-center '>
                                 <h4>Detail Analytics</h4>
-                                <div className='d-flex'>
-                                    <select className='form-control' onChange={(e) => setFilterType(e.target.value)}>
+                                <div className='d-flex gap-1'>
+                                    <select className='form-control w-100' onChange={(e) => setFilterType(e.target.value)}>
                                         {options.map((ele) => {
                                             return <option value={ele.value}>{ele.label}</option>
                                         })}
                                     </select>
                                     {filterType === 'custom' ? (
-                                        <div className="custom">
+                                        <div className="custom w-100">
                                             <Flatpickr options={{
                                                 maxDate: "today",
                                                 mode: "range",
                                                 dateFormat: "Y-m-d"
-                                            }} className='form-control' value={customDate} onChange={(date) => setCustomDate(date)} />
+                                            }} className='form-control w-100' value={customDate} onChange={(date) => setCustomDate(date)} />
 
                                         </div>
                                     ) : ''
@@ -106,20 +106,87 @@ export const DetailAnalytics = () => {
 
             <div className='section-1-heading'>
                 <Row>
+                    <span className='h4 text-left mb-1 mt-1'>Sales</span>
+                </Row>
+                <Row>
                     <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
-                        <CardCom icon={<BarChart2 />} title={'Orders'} indicator={<ArrowDown size={"20px"} color={'red'}/>} indiInfo={'-0.29'} data={!isLoading ? reportData?.orders : <Spinner size={'25px'} />} />
+                        <CardCom icon={<BarChart2 />} title={'Average order value'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.29'} data={!isLoading ? reportData?.orders : <Spinner size={'25px'} />} />
                     </Col>
 
                     <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
-                        <CardCom icon={<PieChart />} title={'Customers'} indicator={<ArrowUp size={"20px"} color={'green'}/>} indiInfo={'-0.45'} data={!isLoading ? reportData?.customers : <Spinner size={'25px'} />} />
+                        <CardCom icon={<PieChart />} title={'Average units ordered'} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.45'} data={!isLoading ? reportData?.customers : <Spinner size={'25px'} />} />
                     </Col>
 
                     <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
-                        <CardCom icon={<BarChart2 />} title={'Sales'} indicator={<ArrowUp size={"20px"} color={'green'}/>} indiInfo={'-0.82' } data={!isLoading ? reportData?.sales : <Spinner size={'25px'} />} />
+                        <CardCom icon={<BarChart2 />} title={'Gross sales'} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.82'} data={!isLoading ? reportData?.sales : <Spinner size={'25px'} />} />
                     </Col>
 
                     <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
-                        <CardCom icon={<BarChart2 />} title={'Return Rate'} indicator={<ArrowDown size={"20px"} color={'red'}/>} indiInfo={'-0.89'} data={!isLoading ? reportData?.return_rate : <Spinner size={'25px'}/>} />
+                        <CardCom icon={<BarChart2 />} title={'Product variants by gross sales'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.89'} data={!isLoading ? reportData?.return_rate : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Sales by billing location'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.29'} data={!isLoading ? reportData?.orders : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<PieChart />} title={'Sales by channel'} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.45'} data={!isLoading ? reportData?.customers : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={<>{'Top product variants'}<br />{'by units sold'}</>} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.82'} data={!isLoading ? reportData?.sales : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Top selling products'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.89'} data={!isLoading ? reportData?.return_rate : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Total sales'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.89'} data={!isLoading ? reportData?.return_rate : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Total sales breakdown'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.89'} data={!isLoading ? reportData?.return_rate : <Spinner size={'25px'} />} />
+                    </Col>
+                </Row>
+
+                
+                <Row>
+                    <span className='h4 text-left mb-1 mt-1'>Orders</span>
+                </Row>
+                <Row>
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Return quantity'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.29'} data={!isLoading ? reportData?.orders : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<PieChart />} title={'Return rate'} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.45'} data={!isLoading ? reportData?.customers : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Top returned products'} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.82'} data={!isLoading ? reportData?.sales : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Total orders'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.89'} data={!isLoading ? reportData?.return_rate : <Spinner size={'25px'} />} />
+                    </Col>
+                </Row>
+
+                
+                <Row>
+                    <span className='h4 text-left mb-1 mt-1'>Behavior</span>
+                </Row>
+                <Row>
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Customers'} indicator={<ArrowDown size={"20px"} color={'red'} />} indiInfo={'-0.29'} data={!isLoading ? reportData?.orders : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<PieChart />} title={'Customer cohort analysis'} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.45'} data={!isLoading ? reportData?.customers : <Spinner size={'25px'} />} />
+                    </Col>
+
+                    <Col className='col-sm-12 col-md-3 col-xxl-3 col-xxxl-3 cursor-pointer'>
+                        <CardCom icon={<BarChart2 />} title={'Returning customer rate'} indicator={<ArrowUp size={"20px"} color={'green'} />} indiInfo={'-0.82'} data={!isLoading ? reportData?.sales : <Spinner size={'25px'} />} />
                     </Col>
                 </Row>
             </div>
