@@ -1,6 +1,6 @@
 // import { lazy } from 'react'
 import DetailAnalytics from '../../views/ReportsApp/DetailAnalytics'
-import GraphicalAnalytics from '../../views/ReportsApp/GraphicalAnalytics'
+import Graph from '../../views/ReportsApp/Graph'
 
 const ReportsApp_Routes = [
     {
@@ -8,8 +8,8 @@ const ReportsApp_Routes = [
         element: <DetailAnalytics />
     },
     {
-        path: '/merchant/ReportsApp/graphicalanalytics/',
-        element: <GraphicalAnalytics />
+        path: '/merchant/ReportsApp/graph/',
+        element: <Graph />
     }
 ]
 

@@ -2,14 +2,14 @@ import axios from "axios"
 import { getToken, removeToken, setToken } from "./auth"
 import jwtDecode from "jwt-decode"
 
-export const baseURL = "https://api.demo.xircls.in"
-export const SuperLeadzBaseURL = "https://apps.demo.xircls.in"
-export const crmURL = "https://crm.xircls.in"
+// export const baseURL = "https://api.demo.xircls.in"
+// export const SuperLeadzBaseURL = "https://apps.demo.xircls.in"
+// export const crmURL = "https://crm.xircls.in"
 
 // Live 
-// export const baseURL = "https://api.xircls.com"
-// export const SuperLeadzBaseURL = "https://apps.xircls.com"
-// export const crmURL = "https://crm.xircls.in"
+export const baseURL = "https://api.xircls.com"
+export const SuperLeadzBaseURL = "https://apps.xircls.com"
+export const crmURL = "https://crm.xircls.in"
 
 export const configUrl = {
 
