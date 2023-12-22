@@ -9,6 +9,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import Spinner from '../Components/DataTable/Spinner'
 import FrontBaseLoader from '../Components/Loader/Loader'
+import countries from '../NewFrontBase/Country'
 
 const AdminHome = () => {
     const [emails, setEmails] = useState([])
@@ -55,6 +56,7 @@ const AdminHome = () => {
             axios.post(`${baseURL}/merchant/plugin/login/?time=${time}`, form_data)
                 .then((res) => {
                     const tokenValue = JSON.stringify(res?.data?.token)
+                    const merchantCurrency = countries.filter((curElem) => curElem?.currency?.code === res?.data?.outlet_list[0]?.outlet_currency)
                     setToken(tokenValue)
 
                     const updatedPermission = {
@@ -62,7 +64,8 @@ const AdminHome = () => {
                         multipleDomain: res?.data?.outlet_list,
                         apiKey: res?.data?.outlet_list[0].api_key,
                         installedApps: res.data.installed_apps,
-                        campaign: res?.data?.status
+                        campaign: res?.data?.status,
+                        currencySymbol: merchantCurrency[0]?.currency?.symbol
                     }
 
                     console.log(updatedPermission)

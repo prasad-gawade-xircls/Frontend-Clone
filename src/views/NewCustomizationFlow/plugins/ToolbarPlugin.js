@@ -616,7 +616,7 @@ const QuillColorModifier = ({ editor, styles, setStyles, type }) => {
               .toolbar .sketch-picker > div:first-child, .sketch-picker > div:nth-child(2) {
                 display: none !important;
               }
-              #colorPickDropdown, #backgroundColorPickDropdown, #alignItemsPickersDropdown {
+              #colorPickDropdown, #backgroundColorPickDropdown {
                 background-color: white !important;
                 padding: 0px !important;
                 border: none !important;
@@ -653,7 +653,7 @@ const QuillColorModifier = ({ editor, styles, setStyles, type }) => {
   )
 }
 
-export default function ToolbarPlugin() {
+export default function ToolbarPlugin({fontFamilies = "Montserrat", mainFontColor = "#444"}) {
   const [editor] = useLexicalComposerContext()
   const toolbarRef = useRef(null)
   const [blockType, setBlockType] = useState("paragraph")
@@ -665,8 +665,7 @@ export default function ToolbarPlugin() {
   // const [showFontSize, setShowFontSize] = useState(false)
   // const [showLineHeight, setShowLineHeight] = useState(false)
   const [fontColor, setFontColor] = useState(false)
-  // const [alignItems, setAlignItems] = useState(false)
-  const [fontColorValue, setFontColorValue] = useState("#000")
+  const [fontColorValue, setFontColorValue] = useState(mainFontColor)
   const [fontBackgroundColor, setFontBackgroundColor] = useState(false)
   const [fontBackgroundColorValue, setFontBackgroundColorValue] = useState("#fff")
   const [codeLanguage, setCodeLanguage] = useState("")
@@ -675,18 +674,10 @@ export default function ToolbarPlugin() {
   const [isItalic, setIsItalic] = useState(false)
   const [isUnderline, setIsUnderline] = useState(false)
   // const [isEditable, setIsEditable] = useState(() => editor.isEditable())
-  const [fontFamily, setFontFamily] = useState('Montserrat')
+  const [fontFamily, setFontFamily] = useState(fontFamilies)
   const [fontSize, setFontSize] = useState('15px')
   const [lineHeight, setLineHeight] = useState('1')
   const [fontWeight, setFontWeight] = useState('300')
-
-
-  const [showContent, setShowContent] = useState(false)
-
-  const handleToggleClick = () => {
-    setShowContent(!showContent)
-  }
-
   // const [isStrikethrough, setIsStrikethrough] = useState(false)
   // const [isCode, setIsCode] = useState(false)
   const updateToolbar = useCallback(() => {
@@ -718,7 +709,7 @@ export default function ToolbarPlugin() {
       // setIsCode(selection.hasFormat("code"))
 
       setFontFamily(
-        $getSelectionStyleValueForProperty(selection, 'font-family', 'Montserrat')
+        $getSelectionStyleValueForProperty(selection, 'font-family', fontFamilies)
       )
       setFontSize(
         $getSelectionStyleValueForProperty(selection, 'font-size', '15px')
@@ -733,7 +724,7 @@ export default function ToolbarPlugin() {
       )
 
       setFontColorValue(
-        $getSelectionStyleValueForProperty(selection, 'color', '#000')
+        $getSelectionStyleValueForProperty(selection, 'color', mainFontColor)
       )
 
       setFontBackgroundColorValue(
@@ -816,9 +807,8 @@ export default function ToolbarPlugin() {
   }, [editor, isLink])
 
   return (
-    <>
-      <div className="toolbar" ref={toolbarRef} onDrag={e => e.stopPropagation()} onDragStart={e => e.stopPropagation()}>
-        {/* <button
+    <div className="toolbar" ref={toolbarRef} onDrag={e => e.stopPropagation()} onDragStart={e => e.stopPropagation()}>
+      <button
         disabled={!canUndo}
         onClick={() => {
           editor.dispatchCommand(UNDO_COMMAND)
@@ -838,308 +828,201 @@ export default function ToolbarPlugin() {
       >
         <i className="format redo" />
       </button>
-      <Divider /> */}
+      <Divider />
+      {supportedBlockTypes.has(blockType) && (
+        <>
+          <UncontrolledButtonDropdown>
+            <DropdownToggle tag="button" className="toolbar-item block-controls">
+              <span className={`icon block-type ${blockType}`} />
+              <span className="text">{blockTypeToBlockName[blockType]}</span>
+              <i className="chevron-down" />
+            </DropdownToggle>
+            <DropdownMenu className='table-menu'>
+              <BlockOptionsDropdownList
+                editor={editor}
+                blockType={blockType}
+                toolbarRef={toolbarRef}
+              // setShowBlockOptionsDropDown={setShowBlockOptionsDropDown}
+              />
+            </DropdownMenu>
+          </UncontrolledButtonDropdown>
 
-        {supportedBlockTypes.has(blockType) && (
-          <>
-            <UncontrolledButtonDropdown>
-              <DropdownToggle tag="button" className="toolbar-item block-controls">
-                <span className={`icon block-type ${blockType}`} />
-                <span className="text">{blockTypeToBlockName[blockType]}</span>
-                <i className="chevron-down" style={{ width: '13px' }} />
-              </DropdownToggle>
-              <DropdownMenu className='table-menu'>
-                <BlockOptionsDropdownList
-                  editor={editor}
-                  blockType={blockType}
-                  toolbarRef={toolbarRef}
-                />
-              </DropdownMenu>
-            </UncontrolledButtonDropdown>
-            <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
-            <Divider />
-          </>
-        )}
+          {/* <button
+            className="toolbar-item block-controls"
+            onClick={() => setShowBlockOptionsDropDown(!showBlockOptionsDropDown)}
+            aria-label="Formatting Options"
+          >
+            <span className={`icon block-type ${blockType}`} />
+            <span className="text">{blockTypeToBlockName[blockType]}</span>
+            <i className="chevron-down" />
+          </button>
+          {showBlockOptionsDropDown &&
+            createPortal(
+              <BlockOptionsDropdownList
+                editor={editor}
+                blockType={blockType}
+                toolbarRef={toolbarRef}
+                setShowBlockOptionsDropDown={setShowBlockOptionsDropDown}
+              />,
+              document.body
+            )} */}
+          <Divider />
+        </>
+      )}
 
-        <UncontrolledButtonDropdown>
-          <DropdownToggle tag="button" className="toolbar-item block-controls">
-            <span className={`icon block-type font-family`} />
-            <span className="text" style={{ marginRight: '13px' }}>{fontFamily}</span>
-            <i className="chevron-down" style={{ width: '13px' }} />
-          </DropdownToggle>
-          <DropdownMenu className='table-menu'>
+      {/* <div id="font-family">
+        <button
+          className="toolbar-item block-controls"
+          onClick={() => {
+            setShowFontFamily(!showFontFamily)
+
+          }}
+          aria-label="Formatting Options"
+        >
+          <span className={`icon block-type font-family`} />
+          <span className="text">{fontFamily}</span>
+          <i className="chevron-down" />
+        </button>
+        {showFontFamily &&
+          createPortal(
             <FontDropDown
               style={'font-family'}
               value={fontFamily}
               editor={editor}
-            />
-          </DropdownMenu>
-        </UncontrolledButtonDropdown>
+              toChange={setShowFontFamily}
+            />,
+            document.body
+          )}
+      </div> */}
 
-        <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
+      <UncontrolledButtonDropdown>
+        <DropdownToggle tag="button" className="toolbar-item block-controls">
+          <span className={`icon block-type font-family`} />
+          <span className="text">{fontFamily}</span>
+          <i className="chevron-down" />
+        </DropdownToggle>
+        <DropdownMenu className='table-menu'>
+          <FontDropDown
+            style={'font-family'}
+            value={fontFamily}
+            editor={editor}
+          />
+        </DropdownMenu>
+      </UncontrolledButtonDropdown>
 
-        <UncontrolledButtonDropdown>
-          <DropdownToggle tag="button" className="toolbar-item block-controls">
-            <span className="text" style={{ width: '40px' }}>{fontSize}</span>
-            <i className="chevron-down" style={{ width: '13px' }} />
-          </DropdownToggle>
-          <DropdownMenu className='table-menu'>
+      <UncontrolledButtonDropdown>
+        <DropdownToggle tag="button" className="toolbar-item block-controls">
+          <span className="text" style={{ width: '40px' }}>{fontSize}</span>
+          <i className="chevron-down" />
+        </DropdownToggle>
+        <DropdownMenu className='table-menu'>
+          <FontDropDown
+            style={'font-size'}
+            value={fontSize}
+            editor={editor}
+          />
+        </DropdownMenu>
+      </UncontrolledButtonDropdown>
+
+      {/* <div id="font-size" className="position-relative">
+        <button
+          className="toolbar-item block-controls"
+          onClick={() => setShowFontSize(!showFontSize)}
+          aria-label="Formatting Options"
+        >
+          <span className="text" style={{ width: '40px' }}>{fontSize}</span>
+          <i className="chevron-down" />
+        </button>
+
+        {showFontSize &&
+          createPortal(
             <FontDropDown
               style={'font-size'}
               value={fontSize}
               editor={editor}
-            />
-          </DropdownMenu>
-        </UncontrolledButtonDropdown>
+              toChange={setShowFontSize}
+            />,
+            document.body
+          )}
 
-        <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
+      </div> */}
 
-        {blockType === "code" ? (
-          <>
-            <Select
-              className="toolbar-item code-language"
-              onChange={onCodeLanguageSelect}
-              options={codeLanguges}
-              value={codeLanguage}
-            />
-            <i className="chevron-down inside" />
-          </>
-        ) : (
-          <>
-            <button
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")
-              }}
-              className={`toolbar-item spaced d-none ${isBold ? "active" : ""}`}
-              aria-label="Format Bold"
-            >
-              <i className="format bold" />
-            </button>
-            <button
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")
-              }}
-              className={`toolbar-item spaced ${isItalic ? "active" : ""}`}
-              aria-label="Format Italics"
-            >
-              <i className="format italic" />
-            </button>
-            <button
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
-              }}
-              className={`toolbar-item spaced ${isUnderline ? "active" : ""}`}
-              aria-label="Format Underline"
-            >
-              <i className="format underline" />
-            </button>
-            <button
-              onClick={insertLink}
-              className={`toolbar-item spaced ${isLink ? "active" : ""}`}
-              aria-label="Insert Link"
-            >
-              <i className="format link" />
-            </button>
-            <i className="chevron-dots" onClick={handleToggleClick} style={{ width: '33px', height: "25px", margin: "auto" }}></i>
-           
 
-            {isLink &&
-              createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
-
-            {showContent && (
-              <>
-               <div style={{ borderBottom: "1px solid #ccc", width: "100vw" }}></div>
-                <UncontrolledButtonDropdown>
-                  <DropdownItem>
-                    <DropdownToggle tag="button" className="toolbar-item block-controls">
-                      <span className="text" style={{ width: '32px' }}><i className="format left-align" /></span>
-                      <i className="chevron-down" style={{ width: '13px' }} />
-                    </DropdownToggle>
-
-                    <DropdownMenu>
-                      <button
-                        onClick={() => {
-                          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
-                        }}
-                        className="toolbar-item spaced  w-100 d-flex gap-2"
-                        aria-label="Left Align"
-                      >
-                        <i className="format left-align" />
-                        <span>Left align</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
-                        }}
-                        className="toolbar-item spaced w-100 d-flex gap-2"
-                        aria-label="Center Align"
-                      >
-                        <i className="format center-align" />
-                        <span>Center align</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
-                        }}
-                        className="toolbar-item spaced w-100 d-flex gap-2"
-                        aria-label="Right Align"
-                      >
-                        <i className="format right-align" />
-                        <span>Right align</span>
-                      </button>
-                    </DropdownMenu>
-                  </DropdownItem>
-                </UncontrolledButtonDropdown>
-
-                <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
-
-                <UncontrolledButtonDropdown>
-                  <DropdownItem>
-                    <DropdownToggle
-                      id="colorPickDropdown"
-                      onClick={() => {
-                        setFontColor(!fontColor)
-                      }}
-                    >
-                      <button
-                        className="toolbar-item block-controls"
-
-                      >
-                        <i className="format font-color" style={{ marginRight: '13px' }} />
-                        <i className="chevron-down" style={{ width: '13px' }} />
-                      </button>
-                      <DropdownMenu>
-                        <div style={{ width: "275px", position: "relative" }} id="quillColorPick"><QuillColorModifier editor={editor} styles={fontColorValue} setStyles={setFontColorValue} type="color" /></div>
-                      </DropdownMenu>
-                    </DropdownToggle>
-                  </DropdownItem>
-                </UncontrolledButtonDropdown>
-
-                <UncontrolledButtonDropdown>
-                  <DropdownItem>
-                    <DropdownToggle
-                      id="backgroundColorPickDropdown"
-                      onClick={() => {
-                        setFontBackgroundColor(!fontBackgroundColor)
-                      }}
-                    >
-                      <button
-                        className="toolbar-item block-controls"
-                      >
-                        <i className="format bg-color" style={{ marginRight: '13px' }} />
-                        <i className="chevron-down" style={{ width: '13px' }} />
-                      </button>
-                      <DropdownMenu>
-                        <div style={{ width: "275px", position: "relative" }} id="quillBackgroundColorPick"><QuillColorModifier editor={editor} styles={fontBackgroundColorValue} setStyles={setFontBackgroundColorValue} type="background-color" /></div>
-                      </DropdownMenu>
-                    </DropdownToggle>
-                  </DropdownItem>
-                </UncontrolledButtonDropdown>
-
-                <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
-
-                <UncontrolledButtonDropdown>
-                  <DropdownToggle tag="button" className="toolbar-item block-controls">
-                    <span className={`icon block-type line-height`} style={{ width: '18.5px' }} />
-                    <span className="text" style={{ width: '18px' }}>{lineHeight}</span>
-                    <i className="chevron-down" style={{ width: '13px' }} />
-                  </DropdownToggle>
-                  <DropdownMenu className='table-menu'>
-                    <FontDropDown
-                      style={'line-height'}
-                      value={lineHeight}
-                      editor={editor}
-                    />
-                  </DropdownMenu>
-                </UncontrolledButtonDropdown>
-
-                <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
-
-                <UncontrolledButtonDropdown>
-                  <DropdownToggle tag="button" className="toolbar-item block-controls">
-                    <span className={`icon block-type bold`} />
-                    <span className="text" style={{ width: '40px' }}>{fontWeight}</span>
-                    <i className="chevron-down" style={{ width: '13px' }} />
-                  </DropdownToggle>
-                  <DropdownMenu className='table-menu'>
-                    <FontDropDown
-                      style={'font-weight'}
-                      value={fontWeight}
-                      editor={editor}
-                    />
-                  </DropdownMenu>
-                </UncontrolledButtonDropdown>
-
-                <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
-
-                <button
-                  disabled={!canUndo}
-                  onClick={() => {
-                    editor.dispatchCommand(UNDO_COMMAND)
-                  }}
-                  className="toolbar-item spaced"
-                  aria-label="Undo"
-                >
-                  <i className="format undo" />
-                </button>
-                <button
-                  disabled={!canRedo}
-                  onClick={() => {
-                    editor.dispatchCommand(REDO_COMMAND)
-                  }}
-                  className="toolbar-item"
-                  aria-label="Redo"
-                >
-                  <i className="format redo" />
-                </button>
-              </>
-
-            )}
-
-            {/* <UncontrolledButtonDropdown>
-            <DropdownItem>
-              <DropdownToggle tag="button" className="toolbar-item block-controls">
-                <span className="text" style={{ width: '32px' }}><i className="format left-align" /></span>
-                <i className="chevron-down" style={{ width: '13px' }} />
-              </DropdownToggle>
-
-              <DropdownMenu>
-                <button
-                  onClick={() => {
-                    editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
-                  }}
-                  className="toolbar-item spaced  w-100 d-flex gap-2"
-                  aria-label="Left Align"
-                >
-                  <i className="format left-align" />
-                  <span>Left align</span>
-                </button>
-                <button
-                  onClick={() => {
-                    editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
-                  }}
-                  className="toolbar-item spaced w-100 d-flex gap-2"
-                  aria-label="Center Align"
-                >
-                  <i className="format center-align" />
-                  <span>Center align</span>
-                </button>
-                <button
-                  onClick={() => {
-                    editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
-                  }}
-                  className="toolbar-item spaced w-100 d-flex gap-2"
-                  aria-label="Right Align"
-                >
-                  <i className="format right-align" />
-                  <span>Right align</span>
-                </button>
-              </DropdownMenu>
-            </DropdownItem>
-          </UncontrolledButtonDropdown>
-
-          <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
-
+      {blockType === "code" ? (
+        <>
+          <Select
+            className="toolbar-item code-language"
+            onChange={onCodeLanguageSelect}
+            options={codeLanguges}
+            value={codeLanguage}
+          />
+          <i className="chevron-down inside" />
+        </>
+      ) : (
+        <>
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")
+            }}
+            className={`toolbar-item spaced d-none ${isBold ? "active" : ""}`}
+            aria-label="Format Bold"
+          >
+            <i className="format bold" />
+          </button>
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")
+            }}
+            className={`toolbar-item spaced ${isItalic ? "active" : ""}`}
+            aria-label="Format Italics"
+          >
+            <i className="format italic" />
+          </button>
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
+            }}
+            className={`toolbar-item spaced ${isUnderline ? "active" : ""}`}
+            aria-label="Format Underline"
+          >
+            <i className="format underline" />
+          </button>
+          <button
+            onClick={insertLink}
+            className={`toolbar-item spaced ${isLink ? "active" : ""}`}
+            aria-label="Insert Link"
+          >
+            <i className="format link" />
+          </button>
+          {isLink &&
+            createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
+            }}
+            className="toolbar-item spaced"
+            aria-label="Left Align"
+          >
+            <i className="format left-align" />
+          </button>
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
+            }}
+            className="toolbar-item spaced"
+            aria-label="Center Align"
+          >
+            <i className="format center-align" />
+          </button>
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
+            }}
+            className="toolbar-item spaced"
+            aria-label="Right Align"
+          >
+            <i className="format right-align" />
+          </button>
           <UncontrolledButtonDropdown>
             <DropdownItem>
               <DropdownToggle
@@ -1150,10 +1033,10 @@ export default function ToolbarPlugin() {
               >
                 <button
                   className="toolbar-item block-controls"
-
+                // aria-label="Formatting Options"
                 >
-                  <i className="format font-color" style={{ marginRight: '13px' }} />
-                  <i className="chevron-down" style={{ width: '13px' }} />
+                  <i className="format font-color" />
+                  <i className="chevron-down" />
                 </button>
                 <DropdownMenu>
                   <div style={{ width: "275px", position: "relative" }} id="quillColorPick"><QuillColorModifier editor={editor} styles={fontColorValue} setStyles={setFontColorValue} type="color" /></div>
@@ -1161,6 +1044,11 @@ export default function ToolbarPlugin() {
               </DropdownToggle>
             </DropdownItem>
           </UncontrolledButtonDropdown>
+          {/* {fontColor &&
+            createPortal(
+              <div style={{ width: "275px", position: "fixed", right: "10px" }} id="quillColorPick"><QuillColorModifier editor={editor} styles={fontColorValue} setStyles={setFontColorValue} type="color" /></div>,
+              document.body
+            )} */}
 
           <UncontrolledButtonDropdown>
             <DropdownItem>
@@ -1172,9 +1060,10 @@ export default function ToolbarPlugin() {
               >
                 <button
                   className="toolbar-item block-controls"
+                // aria-label="Formatting Options"
                 >
-                  <i className="format bg-color" style={{ marginRight: '13px' }} />
-                  <i className="chevron-down" style={{ width: '13px' }} />
+                  <i className="format bg-color" />
+                  <i className="chevron-down" />
                 </button>
                 <DropdownMenu>
                   <div style={{ width: "275px", position: "relative" }} id="quillBackgroundColorPick"><QuillColorModifier editor={editor} styles={fontBackgroundColorValue} setStyles={setFontBackgroundColorValue} type="background-color" /></div>
@@ -1182,14 +1071,28 @@ export default function ToolbarPlugin() {
               </DropdownToggle>
             </DropdownItem>
           </UncontrolledButtonDropdown>
-
-          <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
+          {/* <button
+            id="backgroundColorPickDropdown"
+            className="toolbar-item block-controls"
+            aria-label="Formatting Options"
+            onClick={() => {
+              setFontBackgroundColor(!fontBackgroundColor)
+            }}
+          >
+            <i className="format bg-color" />
+            <i className="chevron-down" />
+          </button> */}
+          {/* {fontBackgroundColor &&
+            createPortal(
+              <div style={{ width: "275px", position: "fixed", right: "10px" }} id="quillBackgroundColorPick"><QuillColorModifier editor={editor} styles={fontBackgroundColorValue} setStyles={setFontBackgroundColorValue} type="background-color" /></div>,
+              document.body
+            )} */}
 
           <UncontrolledButtonDropdown>
             <DropdownToggle tag="button" className="toolbar-item block-controls">
-              <span className={`icon block-type line-height`} style={{ width: '18.5px' }} />
-              <span className="text" style={{ width: '18px' }}>{lineHeight}</span>
-              <i className="chevron-down" style={{ width: '13px' }} />
+              <span className={`icon block-type line-height`} />
+              <span className="text" style={{ width: '40px' }}>{lineHeight}</span>
+              <i className="chevron-down" />
             </DropdownToggle>
             <DropdownMenu className='table-menu'>
               <FontDropDown
@@ -1200,13 +1103,11 @@ export default function ToolbarPlugin() {
             </DropdownMenu>
           </UncontrolledButtonDropdown>
 
-          <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
-
           <UncontrolledButtonDropdown>
             <DropdownToggle tag="button" className="toolbar-item block-controls">
               <span className={`icon block-type bold`} />
               <span className="text" style={{ width: '40px' }}>{fontWeight}</span>
-              <i className="chevron-down" style={{ width: '13px' }} />
+              <i className="chevron-down" />
             </DropdownToggle>
             <DropdownMenu className='table-menu'>
               <FontDropDown
@@ -1217,32 +1118,22 @@ export default function ToolbarPlugin() {
             </DropdownMenu>
           </UncontrolledButtonDropdown>
 
-          <div style={{ borderRight: "1px solid #ccc", height: "29px", marginTop: "auto" }}></div>
 
-          <button
-            disabled={!canUndo}
+          {/* <button
             onClick={() => {
-              editor.dispatchCommand(UNDO_COMMAND)
-            }}
-            className="toolbar-item spaced"
-            aria-label="Undo"
-          >
-            <i className="format undo" />
-          </button>
-          <button
-            disabled={!canRedo}
-            onClick={() => {
-              editor.dispatchCommand(REDO_COMMAND)
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
             }}
             className="toolbar-item"
-            aria-label="Redo"
+            aria-label="Justify Align"
           >
-            <i className="format redo" />
+            <i className="format justify-align" />
           </button> */}
-          </>
-        )
-        }
-      </div >
-    </>
+        </>
+      )}
+      {/* <Modal toggle={() => setFontColor(!fontColor)} className='hide-backdrop' isOpen={fontColor} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
+
+        
+      </Modal> */}
+    </div>
   )
 }

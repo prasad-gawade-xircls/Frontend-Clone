@@ -200,6 +200,8 @@ export default function SuperLeadzOffers() {
                             searchValue={searchValue}
                             filteredData={filteredData}
                             isLoading={isLoading}
+                            isExport={true}
+                            exportUrl={`${SuperLeadzBaseURL}/utils/api/v1/superoffer/`}
                         />
                     </div>
                 </div>

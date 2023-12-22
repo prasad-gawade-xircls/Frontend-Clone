@@ -30,7 +30,7 @@ export default function SuperLeadzLeads() {
         })
             .then((resp) => resp.json())
             .then((data) => {
-                console.log("hjg", data?.data?.lead_list)
+                console.log(data?.data?.lead_list)
                 setTableData(data?.data?.lead_list)
                 setCustVisit(data?.data?.cust_visit)
                 setVerified(data?.data?.verified)
@@ -72,15 +72,10 @@ export default function SuperLeadzLeads() {
     }
 
     const columns = [
-        // {
-        //     name: 'Sr. No.',
-        //     width: '90px',
-        //     cell: (row, index) => index + 1
-        // },
         {
             name: 'Date',
             minWidth: '150px',
-            selector: row =>  moment(row.created_at).format('MMM D, YYYY')
+            selector: row =>  moment(row.created_at).format('ddd, MMM D,YYYY')
         },
         {
             name: 'Time',
@@ -142,17 +137,6 @@ export default function SuperLeadzLeads() {
             //     return status
             // },
             // dataType: 'is_offer'
-        },
-        {
-            name: 'State',
-            minWidth: '10%',
-            cell: (row) => {
-                return (
-                    <div className='d-flex justify-content-start align-items-start flex-column'>
-                        <h6 style={{marginTop: '3px'}}>{row.status === "HOT" ? "Hot" : row.status === "WARM" ? "Warm" : row.status === "COLD" ? "Cold" : ""}</h6>
-                    </div>
-                )
-            }
         }
     ]
 
@@ -230,6 +214,7 @@ export default function SuperLeadzLeads() {
                             isExpand={true}
                             isExport={true}
                             ExpandableTable={ExpandedData}
+                            exportUrl={`${SuperLeadzBaseURL}/api/v1/get/offer/`}
                         />
                     </div>
                 </div>

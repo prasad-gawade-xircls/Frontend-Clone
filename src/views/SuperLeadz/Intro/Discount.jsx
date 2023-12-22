@@ -3,7 +3,7 @@ import Breadcrumb from "../../Components/BreadCrumbs/Breadcrumb"
 import { ArrowLeft, ArrowRight, Info, Percent, PlusCircle, X } from "react-feather"
 import OfferSection from "./OfferSection"
 import IntroWrapper from "../../Components/SuperLeadz/IntroWrapper"
-import { ThemesProvider } from "../../../Helper/Context"
+import { PermissionProvider, ThemesProvider } from "../../../Helper/Context"
 import { useNavigate } from "react-router-dom"
 import { Card, CardBody, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap"
 import axios from "axios"
@@ -12,6 +12,7 @@ import { SuperLeadzBaseURL } from "../../../assets/auth/jwtService"
 
 
 function Discount() {
+  const { userPermission } = useContext(PermissionProvider)
   const navigate = useNavigate()
   const [modal, showModal] = useState(false)
   const handleModal = useCallback(() => showModal(!modal), [modal])
@@ -353,7 +354,7 @@ function Discount() {
               <div className="form-group">
                 <label htmlFor="value">{tempOffer.offer_value_type === "fixed_amount" ? "Flat off" : "Percentage off"} <span title="Number only field"><Info size={"10px"} /></span></label>
                 <div className="position-relative form-control d-flex align-items-center">
-                  {tempOffer.offer_value_type === "fixed_amount" && <span style={{ fontSize: "14px" }}>₹</span>}
+                  {tempOffer.offer_value_type === "fixed_amount" && <span style={{ fontSize: "14px" }}>{userPermission?.currencySymbol}</span>}
                   <input type={"text"} name="value" value={tempOffer.value} className='flex-grow-1 from-control-offer' style={{ outline: "none", border: 'none', boxShadow: "none", padding: '0px' }} onChange={(event) => {
                     const numberRegex = /^\d+$/
                     if (numberRegex.test(event.target.value) || event.target.value === "") {

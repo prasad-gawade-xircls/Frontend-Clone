@@ -10,6 +10,7 @@ import toast from "react-hot-toast"
 import { validForm, validateEmail } from "../Validator"
 import { PermissionProvider } from "../../Helper/Context"
 import FrontBaseLoader from "../Components/Loader/Loader"
+import countries from "../NewFrontBase/Country"
 
 const Emplogin = () => {
     // const [showError, setShowError] = useState(false)
@@ -70,13 +71,15 @@ const Emplogin = () => {
                     } else {
                         
                         const tokenValue = JSON.stringify(res?.data?.token)
+                        const merchantCurrency = countries.filter((curElem) => curElem?.currency?.code === res?.data?.outlet_list[0]?.outlet_currency)
                         setToken(tokenValue)
                         const updatedPermission = {
                             appName: "",
                             multipleDomain: res?.data?.outlet_list ? res?.data?.outlet_list : [],
                             apiKey: res?.data?.outlet_list ? res?.data?.outlet_list[0].api_key : "",
                             installedApps: res?.data?.installed_apps,
-                            campagin: res?.data?.status
+                            campagin: res?.data?.status,
+                            currencySymbol: merchantCurrency[0]?.currency?.symbol
                         }
                         setUserPermission((curData) => ({
                             ...curData,

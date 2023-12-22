@@ -199,11 +199,8 @@ const LiveUpdates = () => {
                         </CardBody>
                     </Card>
                 </> : <>
-                    {/* <Card>
-                        <CardBody> */}
                     <SlUsersAnalytics cardDataObj={cardDataObj} dateRange={dateRange} setDateRange={setDateRange} graphData={lineGraphLive} />
-                    {/* </CardBody>
-                    </Card> */}
+
                     {showData?.length > 0 ? <Row className='match-height'>
                         <Col md='6'>
                             <Card>

@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react"
 import { Card, CardBody, Col, Container, Row } from "reactstrap"
 import axios from "axios"
 import { CheckCircle, Circle } from "react-feather"
-import pig from "../../assets/images/website-slide/pricing/pig.png"
-import money from "../../assets/images/website-slide/pricing/grow.png"
-import pro from "../../assets/images/website-slide/pricing/pro.png"
+// import pig from "../../assets/images/website-slide/pricing/pig.png"
+// import money from "../../assets/images/website-slide/pricing/grow.png"
+// import pro from "../../assets/images/website-slide/pricing/pro.png"
 import { SuperLeadzBaseURL } from "../../assets/auth/jwtService"
 import { getCurrentOutlet } from "../Validator"
 import Spinner from "../Components/DataTable/Spinner"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import PricingCard from "./components/PricingCard"
+// import { PermissionProvider } from "../../Helper/Context"
 
 const JoinUs = () => {
     // const [activeCard, setActiveCard] = useState()
@@ -17,6 +18,10 @@ const JoinUs = () => {
     const [isLoading, setIsLoading] = useState(true)
     const location = useLocation()
     const navigate = useNavigate()
+    // const { userPermission } = useContext(PermissionProvider)
+    const { appName } = useParams()
+
+    console.log(appName, "appName")
     const [selectedPlan, setSelectedPlan] = useState("grow plan")
     // console.log(activeCard)
     const outletData = getCurrentOutlet()
@@ -24,7 +29,7 @@ const JoinUs = () => {
         // e.preventDefault()
         const url = new URL(`${SuperLeadzBaseURL}/api/v1/billing/`)
         const form = {
-            app: "superleadz",
+            app: appName?.toLowerCase(),
             shop: outletData[0]?.web_url,
             billing_plan_id: id
         }
@@ -54,16 +59,16 @@ const JoinUs = () => {
 
     const getBilling = () => {
 
-        fetch(`${SuperLeadzBaseURL}/api/v1/get/billing/?app=superleadz`)
-            .then((resp) => resp.json())
-            .then((data) => {
-                setPlanData(data?.billing_cards)
-                setIsLoading(false)
-            })
-            .catch((error) => {
-                console.log(error)
-                setIsLoading(false)
-            })
+        fetch(`${SuperLeadzBaseURL}/api/v1/get/billing/?app=${appName?.toLowerCase()}`)
+        .then((resp) => resp.json())
+        .then((data) => {
+            setPlanData(data?.billing_cards)
+            setIsLoading(false)
+        })
+        .catch((error) => {
+            console.log(error)
+            setIsLoading(false)
+        })
 
     }
 
@@ -96,7 +101,7 @@ const JoinUs = () => {
                         <CardBody>
                             <div className="d-flex justify-content-end align-items-center">
                                 <a className="btn btn-outline-primary" onClick={() => {
-                                  navigate("/merchant/SuperLeadz/joinus/")
+                                  navigate(`/merchant/${appName}/joinus/`)
                                 }}>Show All Plans</a>
                             </div>
                             <div className="textContent text-center pt-3">
@@ -111,164 +116,13 @@ const JoinUs = () => {
                                             isLoading ? <div className="d-flex justify-content-center align-items-center">
                                                 <Spinner size={'40px'} />
                                             </div> : planData?.map((cur) => {
-                                                return cur.plan_name === 'lite plan' ? <>
-                                                    <PricingCard id={cur.id} title='Lite' price={cur.app_price} planTitle="lite plan" selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan} imgSrc={pig} callPlans={callPlans} btnCondition={Number(location?.state) <= Number(cur.app_price)} features={["7,500 pop-up views"]} popular={false} />
-                                                    {/* <div className="col-lg-3 col-md-6">
-                                                        <div className={`card cursor-pointer ${selectedPlan === 'lite plan' ? 'border-primary' : ''}`} onClick={() => setSelectedPlan('lite plan')} style={{ border: '1px solid #dddde0' }}>
-                                                            <div className="card-body pt-2 pb-2 text-center">
-                                                                <div className="image" style={{ padding: '24px' }}>
-                                                                    <img width="140px" style={{ marginBottom: '20px' }} height="140px" src={pig} alt="" />
-                                                                    <h4>Lite</h4>
-                                                                    <p className="m-0" style={{ fontSize: '15px' }}>Great for starting out</p>
-                                                                </div>
-
-                                                                <div className="pricing" style={{ padding: '0px 24px 24px' }}>
-                                                                    <h2 style={{ fontSize: '3rem', lineHeight: '1' }} className="position-relative d-inline text-primary">
-                                                                        <sup className="text-dark" style={{ position: 'absolute', top: '8px', left: '-10px', fontSize: '.8125rem' }}>$</sup>
-                                                                        {cur.app_price}
-                                                                    </h2>
-                                                                    <sup className="text-dark mb-0" style={{ fontSize: '.8125rem', marginLeft: '5px' }}>/month</sup>
-                                                                </div>
-                                                                <div className="points" style={{ padding: '0px 24px 24px' }}>
-                                                                    <div className="point d-flex justify-content-start align-items-center" style={{ gap: "8px", marginBottom: '12px' }}>
-                                                                        <Circle size={11} fill="#464646" stroke="#464646"  />
-                                                                        <h5 className="m-0" style={{ fontSize: '15px', textAlign: "left" }}>7,500 pop-up views</h5>
-                                                                    </div>
-
-                                                                </div>
-                                                                <div className="action">
-                                                                    {
-                                                                        Number(location?.state) <= Number(cur.app_price) ? (
-                                                                            <a className={`btn ${selectedPlan === 'lite plan' ? 'bg-primary text-white' : 'bg-light-primary text-primry'} w-100 btn-block`} onClick={() => callPlans(cur.id)}>Buy Now</a>
-                                                                        ) : (
-                                                                            <a className="btn bg-light-secondary w-100 text-primary btn-block">Buy Now</a>
-                                                                        )
-                                                                    }
-                                                                    
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div> */}
-                                                </> : cur.plan_name === 'grow plan' ? <>
-                                                    <PricingCard id={cur.id} title='Grow' price={cur.app_price} planTitle="grow plan" selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan} imgSrc={money} callPlans={callPlans} btnCondition={Number(location?.state) <= Number(cur.app_price)} features={["25,000 pop-up views"]} popular={true} />
-                                                    {/* <div className="col-lg-3 col-md-6">
-                                                        <div className={`card position-relative ${selectedPlan === 'grow plan' ? 'border-primary' : ''}`} onClick={() => setSelectedPlan('grow plan')} style={{ border: '1px solid #dddde0' }}>
-                                                            <span className="badge bg-light-primary" style={{ position: 'absolute', top: '15px', right: '15px' }}>Popular</span>
-                                                            <div className="card-body pt-2 pb-2 text-center">
-                                                                <div className="image" style={{ padding: '24px' }}>
-                                                                    <img width="140px" style={{ marginBottom: '20px' }} height="140px" src={money} alt="" />
-                                                                    <h4>Grow</h4>
-                                                                    <p className="m-0" style={{ fontSize: '15px' }}>For small to medium businesses</p>
-                                                                </div>
-
-                                                                <div className="pricing" style={{ padding: '0px 24px 24px' }}>
-                                                                    <h2 style={{ fontSize: '3rem', lineHeight: '1' }} className="position-relative d-inline text-primary">
-                                                                        <sup className="text-dark" style={{ position: 'absolute', top: '8px', left: '-10px', fontSize: '.8125rem' }}>$</sup>
-                                                                        {cur.app_price}
-                                                                    </h2>
-                                                                    <sup className="text-dark mb-0" style={{ fontSize: '.8125rem', marginLeft: '5px' }}>/month</sup>
-                                                                </div>
-                                                                <div className="points" style={{ padding: '0px 24px 24px' }}>
-                                                                    <div className="point d-flex justify-content-start align-items-center" style={{ gap: "8px", marginBottom: '12px' }}>
-                                                                        <Circle size={11} fill="#464646" stroke="#464646"  />
-                                                                        <h5 className="m-0" style={{ fontSize: '15px', textAlign: "left" }}>25,000 pop-up views</h5>
-                                                                    </div>
-                                                                
-                                                                </div>
-                                                                <div className="action">
-                                                                    {
-                                                                        Number(location?.state) <= Number(cur.app_price) ? (
-                                                                            <a className={`btn ${selectedPlan === 'grow plan' ? 'bg-primary text-white' : 'bg-light-primary text-primry'} w-100 btn-block`} onClick={() => callPlans(cur.id)}>Buy Now</a>
-                                                                        ) : (
-                                                                            <a className="btn bg-light-secondary w-100 text-primary btn-block">Buy Now</a>
-                                                                        )
-                                                                    }
-                                                                    
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div> */}
-                                                </> : cur.plan_name === 'pro plan' ? <>
-                                                    <PricingCard id={cur.id} title='Pro' price={cur.app_price} planTitle="pro plan" selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan} imgSrc={pro} callPlans={callPlans} btnCondition={Number(location?.state) <= Number(cur.app_price)} features={["125,000 pop-up views", "Remove XIRCLS branding"]} popular={false} />
-                                                    {/* <div className="col-lg-3 col-md-6">
-                                                        <div className={`card cursor-pointer ${selectedPlan === 'pro plan' ? 'border-primary' : ''}`} onClick={() => setSelectedPlan('pro plan')} style={{ border: '1px solid #dddde0' }}>
-                                                            <div className="card-body pt-2 pb-2 text-center">
-                                                                <div className="image" style={{ padding: '24px' }}>
-                                                                    <img width="140px" style={{ marginBottom: '20px' }} height="140px" src={pro} alt="" />
-                                                                    <h4>Pro</h4>
-                                                                    <p className="m-0" style={{ fontSize: '15px' }}>For growth-stage companies</p>
-                                                                </div>
-
-                                                                <div className="pricing" style={{ padding: '0px 24px 24px' }}>
-                                                                    <h2 style={{ fontSize: '3rem', lineHeight: '1' }} className="position-relative d-inline text-primary">
-                                                                        <sup className="text-dark" style={{ position: 'absolute', top: '8px', left: '-10px', fontSize: '.8125rem' }}>$</sup>
-                                                                        {cur.app_price}
-                                                                    </h2>
-                                                                    <sup className="text-dark mb-0" style={{ fontSize: '.8125rem', marginLeft: '5px' }}>/month</sup>
-                                                                </div>
-                                                                <div className="points" style={{ padding: '0px 24px 24px' }}>
-                                                                    <div className="point d-flex justify-content-start align-items-center" style={{ gap: "8px", marginBottom: '12px' }}>
-                                                                        <Circle size={11} fill="#464646" stroke="#464646" />
-                                                                        <h5 className="m-0" style={{ fontSize: '15px', textAlign: "left" }}>125,000 pop-up views</h5>
-                                                                    </div>
-                                                                    <div className="point d-flex justify-content-start align-items-center" style={{ gap: "8px", marginBottom: '12px' }}>
-                                                                        <Circle size={11} fill="#464646" stroke="#464646" />
-                                                                        <h5 className="m-0" style={{ fontSize: '15px', textAlign: "left" }}>Remove XIRCLS branding</h5>
-                                                                    </div>
-
-                                                                </div>
-                                                                <div className="action">
-                                                                    {
-                                                                        Number(location?.state) <= Number(cur.app_price) ? (
-                                                                            <a className={`btn ${selectedPlan === 'pro plan' ? 'bg-primary text-white' : 'bg-light-primary text-primry'} w-100 btn-block`} onClick={() => callPlans(cur.id)}>Buy Now</a>
-                                                                        ) : (
-                                                                            <a className="btn bg-light-secondary w-100 text-primary btn-block">Buy Now</a>
-                                                                        )
-                                                                    }
-                                                                    
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div> */}
-                                                </> : cur.plan_name === 'free' ? <>
-                                                    <PricingCard id={cur.id} title='Forever Free' price={cur.app_price} planTitle="free" selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan} imgSrc={pro} callPlans={callPlans} btnCondition={Number(location?.state) <= Number(cur.app_price)} features={["1,000 pop-up views"]} popular={false} />
-                                                    {/* <div className="col-lg-3 col-md-6">
-                                                        <div className={`card cursor-pointer ${selectedPlan === 'free' ? 'border-primary' : ''}`} onClick={() => setSelectedPlan('free')} style={{ border: '1px solid #dddde0' }}>
-                                                            <div className="card-body pt-2 pb-2 text-center">
-                                                                <div className="image" style={{ padding: '24px' }}>
-                                                                    <img width="140px" style={{ marginBottom: '20px' }} height="140px" src={pro} alt="" />
-                                                                    <h4>Forever Free</h4>
-                                                                    <p className="m-0" style={{ fontSize: '15px' }}>&nbsp;</p>
-                                                                </div>
-
-                                                                <div className="pricing" style={{ padding: '0px 24px 24px' }}>
-                                                                    <h2 style={{ fontSize: '3rem', lineHeight: '1' }} className="position-relative d-inline text-primary">
-                                                                        <sup className="text-dark" style={{ position: 'absolute', top: '8px', left: '-10px', fontSize: '.8125rem' }}>$</sup>
-                                                                        {cur.app_price}
-                                                                    </h2>
-                                                                    <sup className="text-dark mb-0" style={{ fontSize: '.8125rem', marginLeft: '5px' }}>/month</sup>
-                                                                </div>
-                                                                <div className="points" style={{ padding: '0px 24px 24px' }}>
-                                                                    <div className="point d-flex justify-content-start align-items-center" style={{ gap: "8px", marginBottom: '12px' }}>
-                                                                        <Circle size={11} fill="#464646" stroke="#464646" />
-                                                                        <h5 className="m-0" style={{ fontSize: '15px', textAlign: "left" }}>1,000 pop-up views</h5>
-                                                                    </div>
-
-                                                                </div>
-                                                                <div className="action">
-                                                                    {
-                                                                        Number(location?.state) <= Number(cur.app_price) ? (
-                                                                            <a className={`btn ${selectedPlan === 'free' ? 'bg-primary text-white' : 'bg-light-primary text-primry'} w-100 btn-block`} onClick={() => callPlans(cur.id)}>Buy Now</a>
-                                                                        ) : (
-                                                                            <a className="btn bg-light-secondary w-100 text-primary btn-block">Buy Now</a>
-                                                                        )
-                                                                    }
-                                                                    
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div> */}
-                                                </> : ""
+                                                let details
+                                                try {
+                                                    details = JSON.parse(cur?.details)
+                                                } catch (error) {
+                                                    details = cur?.details
+                                                }
+                                                return <PricingCard id={cur.id} title={cur.plan_name} price={cur.app_price} planTitle={cur.plan_name} selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan} callPlans={callPlans} btnCondition={Number(location?.state) <= Number(cur.app_price)} features={details ? details : []} popular={false} />
 
                                             })
                                         }

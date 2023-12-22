@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { User, BarChart2, RefreshCw, DollarSign, Info, Menu, UserPlus, UserCheck, Users, Percent, Check } from 'react-feather'
 import { Button, Card, CardBody, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap'
 import { SiConvertio } from "react-icons/si"
@@ -9,8 +9,10 @@ import { SuperLeadzBaseURL } from '../../../assets/auth/jwtService'
 import Spinner from '../../Components/DataTable/Spinner'
 import CardCom from '../../Components/SuperLeadz/CardCom'
 import { getCurrentOutlet } from '../../Validator'
+import { PermissionProvider } from '../../../Helper/Context'
 
 const Campaign = () => {
+    const { userPermission } = useContext(PermissionProvider)
     const [performanceData, setPerformanceData] = useState({
         active_campaign: "0",
         campaign_revenue: "0",
@@ -226,7 +228,7 @@ const Campaign = () => {
             </div>
 
             <Col className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default'>
-                <CardCom icon={<img src='https://cdn-icons-png.flaticon.com/512/1773/1773345.png' width='25px' />} title="Campaign Revenue" info={'Sum Total Revenue through SuperLeadz Campaign'} data={!isLoading ? `₹${performanceData.campaign_revenue}` : <Spinner size={'25px'} />} />
+                <CardCom icon={<img src='https://cdn-icons-png.flaticon.com/512/1773/1773345.png' width='25px' />} title="Campaign Revenue" info={'Sum Total Revenue through SuperLeadz Campaign'} data={!isLoading ? `${userPermission?.currencySymbol}${performanceData.campaign_revenue}` : <Spinner size={'25px'} />} />
             </Col>
             
             <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default'>

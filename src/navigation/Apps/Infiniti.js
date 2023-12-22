@@ -91,12 +91,18 @@ export const InfinitiNavigation = [
           title: 'Total',
           icon: <Circle size={16} />,
           navLink: '/merchant/reports/'
-        },
-        {
-          id: 'analytics',
-          title: 'Detail Analytics',
-          icon: <Circle size={16} />,
-          navLink: '/merchant/reports/detailAnalytics/'
+        // },
+        // {
+        //   id: 'partners',
+        //   title: 'Partners',
+        //   icon: <Circle size={16} />,
+        //   navLink: '/merchant/report/reports/'
+        // },
+        // {
+        //   id: 'pva_partner',
+        //   title: 'PVA Partner',
+        //   icon: <Circle size={16} />,
+        //   navLink: '/merchant/report/visual_reports/'
         }
       ]
     },

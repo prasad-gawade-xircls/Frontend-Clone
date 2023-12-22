@@ -1,8 +1,10 @@
 import React from 'react'
 import { Download, X } from 'react-feather'
+import ReturnOfferHtml from '../../NewCustomizationFlow/ReturnOfferHtml'
 
-const JsonToJsx = ({ renderObj, isMobile, scale }) => {
+const JsonToJsx = ({ renderObj, isMobile, scale, index = 0 }) => {
     const findObj = renderObj[`${isMobile ? "mobile_" : ""}pages`]
+    // console.log(findObj, "findObj")
     return (
         <div className='setDefault'>
             <style>{`
@@ -23,7 +25,7 @@ const JsonToJsx = ({ renderObj, isMobile, scale }) => {
                     e.stopPropagation()
                 }} />
                 <div id="dropZoneParent" className="pop-up" style={{ position: 'relative', zIndex: '300', overflow: "visible", ...renderObj?.backgroundStyles?.[`${isMobile ? "mobile_" : ""}main`], backgroundColor: renderObj?.backgroundStyles?.[`${isMobile ? "mobile_" : ""}main`]?.backgroundColor, backgroundImage: renderObj?.backgroundStyles?.[`${isMobile ? "mobile_" : ""}main`]?.backgroundImage, width: "100%", maxWidth: "100%", marginTop: "0px", marginRight: "0px", marginBottom: "0px", marginLeft: "0px" }}>
-                    {findObj && findObj[0]?.values?.map((cur, key) => {
+                    {findObj && findObj[index]?.values?.map((cur, key) => {
                         return <div style={{ ...cur?.style, display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }} key={key}
                             id={`${"main"}-${key}-parent-grandparent`}
                         >
@@ -173,6 +175,22 @@ const JsonToJsx = ({ renderObj, isMobile, scale }) => {
                                                                     </div>
                                                                 </div>
                                                             )
+                                                        case 'offer': 
+                                                        // console.log(renderObj?.selectedOffers, "offers")
+                                                            return (
+                                                                <>
+                                                                    {
+                                                                        renderObj?.selectedOffers?.map((ele, key) => {
+                                                                            return (
+                                                                                <>
+                                                                                    <ReturnOfferHtml details={ele} key={key} theme={renderObj?.offerTheme} colors={renderObj?.offerProperties?.colors} />
+                                                                                </>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                </>
+                                                            )
+                                                                
                                                     }
                                                 })}
                                             </div>

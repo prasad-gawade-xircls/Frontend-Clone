@@ -4,7 +4,7 @@ import { allThemes } from './allThemes'
 // import theme3 from "../../SuperLeadz/Customization/theme3.png"
 // import theme4 from "../../SuperLeadz/Customization/theme4.png"
 // import moment from 'moment/moment'
-import axios from 'axios'
+// import axios from 'axios'
 import { SuperLeadzBaseURL } from '../../../assets/auth/jwtService'
 // import toast from 'react-hot-toast'
 
@@ -118,26 +118,6 @@ const CustomizationWrap = ({ children }) => {
             button_match: true
         })
     }, [selectedThemeNo])
-
-    useEffect(() => {
-        if (window.location.pathname.includes("SuperLeadz")) {
-            const getUrl = new URL(`${SuperLeadzBaseURL}/api/v1/add_default_theme/`)
-        axios({
-            method: "GET",
-            url: getUrl
-        }).then(() => {
-            // const newArr = []
-            // data.data.success.forEach((item, key) => {
-            //     newArr.push({ ...JSON.parse(item.default_theme), imagePrev: allThemes[key].imagePrev, theme_id: item.id })
-            // })
-            // setAllThemes(newArr)
-            // console.log({newArr})
-        }).catch((error) => {
-            // toast.error("error occured", error)
-            console.log('4166 --error occured customizationwrap.jsx ', error)
-        })
-    }
-    }, [])
 
     useEffect(() => {
         localStorage.setItem("selectedCustThemeId", selectedCustThemeId)

@@ -8,7 +8,7 @@ import { AccordionBody, AccordionHeader, AccordionItem, Card, CardBody, Modal, M
 import CustomColorModifier from '../../FormBuilder/FormBuilder(components)/CustomColorModifier'
 // import Theme1 from "../Customization/Theme1"
 // import Theme4 from "../Customization/Theme4"
-import { ThemesProvider } from '../../../Helper/Context'
+import { PermissionProvider, ThemesProvider } from '../../../Helper/Context'
 import { Pagination, Navigation, Autoplay } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react/swiper-react.js'
 import 'swiper/swiper.min.css'
@@ -31,6 +31,7 @@ import Breadcrumb from '../../Components/BreadCrumbs/Breadcrumb'
 import Editor from '../../NewCustomizationFlow/Editor'
 
 const Customization = () => {
+    const { userPermission } = useContext(PermissionProvider)
     const themeLoc = useLocation()
     const { selectedThemeNo, oldThemes: allThemes, setOldThemes: setAllThemes, selectedCustThemeId, selectedThemeId } = useContext(ThemesProvider)
 
@@ -1162,7 +1163,7 @@ const Customization = () => {
                                                                                                                                                 {
                                                                                                                                                     ele?.Type === "PERCENTAGE" ? (
                                                                                                                                                         `${Number(ele?.Value).toFixed(0)}%`
-                                                                                                                                                    ) : `₹${Number(ele?.Value).toFixed(0)}`
+                                                                                                                                                    ) : `${userPermission?.currencySymbol}${Number(ele?.Value).toFixed(0)}`
                                                                                                                                                 }
                                                                                                                                             </h1>
                                                                                                                                         </div>
@@ -1768,7 +1769,7 @@ const Customization = () => {
                                                                                                                                                                     {
                                                                                                                                                                         ele?.Type === "PERCENTAGE" ? (
                                                                                                                                                                             `${Number(ele?.Value).toFixed(0)}%`
-                                                                                                                                                                        ) : `₹${Number(ele?.Value).toFixed(0)}`
+                                                                                                                                                                        ) : `${userPermission?.currencySymbol}${Number(ele?.Value).toFixed(0)}`
                                                                                                                                                                     }
                                                                                                                                                                 </h1>
                                                                                                                                                             </div>
@@ -2579,7 +2580,7 @@ const Customization = () => {
                                                                                                     {
                                                                                                         ele?.Type === "PERCENTAGE" ? (
                                                                                                             `${Number(ele?.Value)?.toFixed(0)}%`
-                                                                                                        ) : `₹${Number(ele?.Value)?.toFixed(0)}`
+                                                                                                        ) : `${userPermission?.currencySymbol}${Number(ele?.Value)?.toFixed(0)}`
                                                                                                     }
                                                                                                 </h1>
                                                                                             </div>

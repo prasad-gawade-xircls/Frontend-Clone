@@ -63,7 +63,6 @@ const Themes = () => {
                                     <CardBody>
                                         <div style={{aspectRatio: "16/9"}}>
                                             <div className="d-flex justify-content-center align-items-center rounded position-relative m-auto" style={{ aspectRatio: phoneView[key] ? '9/16' : '16/9', height: '100%', backgroundSize: "100%", backgroundImage: `url(${skeletonBg})`, backgroundColor: "rgba(0,0,0,0.25)", backgroundBlendMode: "soft-light" }}>
-                                                {/* <img alt={`wassup-${key}`} src={theme?.imagePrev} width={"75%"} className='d-block m-auto' style={{ filter: "drop-shadow(0px 0px 15px rgba(0,0,0,0.75))" }} /> */}
                                                 <div style={{ position: "absolute", scale: phoneView[key] ? "0.625" : "0.75", width: phoneView[key] ? "300px" : "100%" }}>
                                                     <JsonToJsx key={key} isMobile={phoneView[key]} renderObj={theme.object} />
                                                 </div>

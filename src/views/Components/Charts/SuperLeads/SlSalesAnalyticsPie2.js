@@ -1,7 +1,9 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
+// import { PermissionProvider } from '../../../../Helper/Context'
 
 export default function SlSalesAnalyticsPie2() {
+  // const {userPermission} = useContext(PermissionProvider)
     const series = [30, 70]
     const options = {
       chart: {
@@ -55,7 +57,7 @@ export default function SlSalesAnalyticsPie2() {
           left: '35%',
           transform: 'translate(-50%, -50%)',
           fontSize: '16px'
-        }} className="custom-text" > Total<br /> ₹2.5M </div> */}
+        }} className="custom-text" > Total<br /> {userPermission?.currencySymbol}2.5M </div> */}
     </div>
   )
 }

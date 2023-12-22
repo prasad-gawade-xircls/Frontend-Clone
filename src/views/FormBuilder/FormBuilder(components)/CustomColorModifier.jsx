@@ -2,7 +2,7 @@ import React from 'react'
 import { SketchPicker } from 'react-color'
 import { Card, CardBody } from 'reactstrap'
 
-const CustomColorModifier = ({ type, setMainStyle, mainStyle, pageCondition, styles, setStyles, colorType }) => {
+const CustomColorModifier = ({ type, setMainStyle, mainStyle, pageCondition, styles, setStyles, colorType, isHex }) => {
     // console.log({styles, setStyles, colorType}, "colorType")
     const getBgColor = (colorArg) => {
         if (colorArg) {
@@ -23,7 +23,7 @@ const CustomColorModifier = ({ type, setMainStyle, mainStyle, pageCondition, sty
             } else {
                 // console.log(colorArg, "colorArg")
                 return colorArg
-            } 
+            }
         }
     }
 
@@ -57,39 +57,47 @@ const CustomColorModifier = ({ type, setMainStyle, mainStyle, pageCondition, sty
                                     type === "cross" ? (
                                         <SketchPicker color={getBgColor(mainStyle?.crossButtons[`${pageCondition}`][`${colorType}`])} onChange={(e) => {
                                             const { r, g, b, a } = e.rgb
-                                            setMainStyle({ ...mainStyle, crossButtons: {...mainStyle?.crossButtons, [`${pageCondition}`]: {...mainStyle?.crossButtons[`${pageCondition}`], [colorType]: `rgba(${r},${g},${b},${a})`}}})
+                                            setMainStyle({ ...mainStyle, crossButtons: { ...mainStyle?.crossButtons, [`${pageCondition}`]: { ...mainStyle?.crossButtons[`${pageCondition}`], [colorType]: `rgba(${r},${g},${b},${a})` } } })
                                         }} />
-                                        
-                                     ) : type === "offerColors" ? (
+
+                                    ) : type === "offerColors" ? (
                                         <SketchPicker color={getBgColor(mainStyle?.offerProperties?.colors[`${colorType}`])} onChange={(e) => {
                                             const { r, g, b, a } = e.rgb
-                                            setMainStyle({ ...mainStyle, offerProperties: {...mainStyle?.offerProperties, colors: {...mainStyle?.offerProperties?.colors, [colorType]: `rgba(${r},${g},${b},${a})`}}})
+                                            setMainStyle({ ...mainStyle, offerProperties: { ...mainStyle?.offerProperties, colors: { ...mainStyle?.offerProperties?.colors, [colorType]: `rgba(${r},${g},${b},${a})` } } })
                                         }} />
-                                        
-                                     ) : (
+
+                                    ) : (
                                         <SketchPicker color={getBgColor(styles[colorType])} onChange={(e) => {
-                                            const { r, g, b, a } = e.rgb
-                                            setStyles({...styles, [colorType]: `rgba(${r},${g},${b},${a})`})
+                                            if (isHex) {
+                                                setStyles({ ...styles, [colorType]: e?.hex })
+                                            } else {
+                                                const { r, g, b, a } = e.rgb
+                                                setStyles({ ...styles, [colorType]: `rgba(${r},${g},${b},${a})` })
+                                            }
                                         }} />
                                     )
-                                    
+
                                 ) : (
                                     type === "cross" ? (
                                         <SketchPicker color={getBgColor(mainStyle?.crossButtons[`${pageCondition}`][`${colorType}`])} onChange={(e) => {
                                             const { r, g, b, a } = e.rgb
-                                            setMainStyle({ ...mainStyle, crossButtons: {...mainStyle?.crossButtons, [`${pageCondition}`]: {...mainStyle?.crossButtons[`${pageCondition}`], [colorType]: `rgba(${r},${g},${b},${a})`}}})
+                                            setMainStyle({ ...mainStyle, crossButtons: { ...mainStyle?.crossButtons, [`${pageCondition}`]: { ...mainStyle?.crossButtons[`${pageCondition}`], [colorType]: `rgba(${r},${g},${b},${a})` } } })
                                         }} />
-                                        
-                                     ) : type === "offerColors" ? (
+
+                                    ) : type === "offerColors" ? (
                                         <SketchPicker color={getBgColor(mainStyle?.offerProperties?.colors[`${colorType}`])} onChange={(e) => {
                                             const { r, g, b, a } = e.rgb
-                                            setMainStyle({ ...mainStyle, offerProperties: {...mainStyle?.offerProperties, colors: {...mainStyle?.offerProperties?.colors, [colorType]: `rgba(${r},${g},${b},${a})`}}})
+                                            setMainStyle({ ...mainStyle, offerProperties: { ...mainStyle?.offerProperties, colors: { ...mainStyle?.offerProperties?.colors, [colorType]: `rgba(${r},${g},${b},${a})` } } })
                                         }} />
-                                        
-                                     ) : (
+
+                                    ) : (
                                         <SketchPicker color={getBgColor(styles[colorType])} onChange={(e) => {
-                                            const { r, g, b, a } = e.rgb
-                                            setStyles({...styles, [colorType]: `rgba(${r},${g},${b},${a})`})
+                                            if (isHex) {
+                                                setStyles({ ...styles, [colorType]: e?.hex })
+                                            } else {
+                                                const { r, g, b, a } = e.rgb
+                                                setStyles({ ...styles, [colorType]: `rgba(${r},${g},${b},${a})` })
+                                            }
                                         }} />
                                     )
                                 )

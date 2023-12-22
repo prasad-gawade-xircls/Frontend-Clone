@@ -130,11 +130,6 @@ const SuperLeadzBilling = () => {
 
     const columns = [
         {
-            name: 'Sr No.',
-            cell: (row, index) => index + 1,
-            width: '10%'
-        },
-        {
             name: 'Start Date',
             cell: (row) => {
                 // let data

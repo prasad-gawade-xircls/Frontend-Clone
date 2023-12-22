@@ -27,7 +27,7 @@ export const commonObj = {
 export const elementStyles = {
     button: {
         fontSize: "12px",
-        backgroundColor: "#7367f0",
+        backgroundColor: "#727272",
         color: "#ffffff",
         borderRadius: "5px",
         width: "auto",

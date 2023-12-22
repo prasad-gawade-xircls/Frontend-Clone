@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button, Card, CardBody } from 'reactstrap'
 import SelectElement from '../Components/NewThemeComponents/SelectElement'
 // import { main_categories, sub_categories } from '../../Helper/data'
@@ -8,6 +8,7 @@ import { SuperLeadzBaseURL, getReq } from '../../assets/auth/jwtService'
 import waterMark from "@src/assets/images/logo/xircls-waterMark.png"
 import { getCurrentOutlet, imageValidation } from '../Validator'
 import { Kidoptions, Maleoptions, RatioList, callToAction } from '../../Helper/data'
+import { PermissionProvider } from '../../Helper/Context'
 
 const defaultData = {
     offer_type: "Acquisition",
@@ -46,6 +47,7 @@ const defaultData = {
 }
 
 const Create_offerss = () => {
+    const { userPermission } = useContext(PermissionProvider)
     const [curStep, setCurStep] = useState(1)
     const [offerData, setOfferData] = useState(defaultData)
     // const [endDateVal, setEndDateVal] = useState("")
@@ -454,7 +456,7 @@ const Create_offerss = () => {
                                                 <div className="row">
                                                     <div className="col-4">
                                                         <label htmlFor="">{offerData.discount_type === 'percentage' ? "Percentage off" : "Discount value"}</label>
-                                                        <input placeholder={offerData.discount_type === 'percentage' ? "%" : "₹"} name='discount_value' type="text" className="w-100 from-control-offer" onChange={(e) => updateOfferData(e)} value={offerData.discount_value} />
+                                                        <input placeholder={offerData.discount_type === 'percentage' ? "%" : `${userPermission?.currencySymbol}`} name='discount_value' type="text" className="w-100 from-control-offer" onChange={(e) => updateOfferData(e)} value={offerData.discount_value} />
                                                     </div>
                                                     {
                                                         offerData.discount_level === "BXGY" ? <div className='col-4'>
@@ -556,7 +558,7 @@ const Create_offerss = () => {
                                                     
                                                     <div>
                                                         <label htmlFor="">{ offerData.cart_condition === "Amount" ? "Amount" : offerData.cart_condition === "Items" ? "Minimum quantity" : ""}</label> <br />
-                                                        <input type="text" className="w-40 from-control-offer" placeholder={ offerData.cart_condition === "Amount" ? "₹ 0.00" : offerData.cart_condition === "Items" ? "0" : ""} name="min_order_value" onChange={(e) => updateOfferData(e)} value={offerData.min_order_value} />
+                                                        <input type="text" className="w-40 from-control-offer" placeholder={ offerData.cart_condition === "Amount" ? `${userPermission?.currencySymbol} 0.00` : offerData.cart_condition === "Items" ? "0" : ""} name="min_order_value" onChange={(e) => updateOfferData(e)} value={offerData.min_order_value} />
                                                     </div>
 
                                                     <div className="xircls_radio mb-1">

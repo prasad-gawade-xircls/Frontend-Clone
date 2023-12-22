@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import ReactApexChart from 'react-apexcharts'
+import { PermissionProvider } from '../../../../Helper/Context'
 
 export default function SlSalesAnalyticsBar2() {
+  const {userPermission} = useContext(PermissionProvider)
     const series = [
         {
           name: 'SuperLeadz',
@@ -65,7 +67,7 @@ export default function SlSalesAnalyticsBar2() {
         },
         yaxis: {
           labels: {
-            formatter: (value) => `₹ ${value} `
+            formatter: (value) => `${userPermission?.currencySymbol} ${value} `
           },
             title: {
               text: 'Revenue (in Lakhs)'

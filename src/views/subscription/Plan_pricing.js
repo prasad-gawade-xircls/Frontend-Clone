@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './css/SelectPlan.css'
 import { Container, Col, Row, Card, CardBody, Modal } from 'reactstrap'
 import Swipe from "./components/Swipe"
 import { Check, X } from 'react-feather'
 import $ from 'jquery'
 import { phonecode_list } from '../../default_components/MainData'
+import { PermissionProvider } from '../../Helper/Context'
 
 const Pricing = () => {
+    const { userPermission } = useContext(PermissionProvider)
     const [modal, setModal] = React.useState(false)
     const toggle = () => setModal(!modal)
     const handleClose = () => setModal(false)
@@ -186,7 +188,7 @@ const Pricing = () => {
                                         <Card className="border-1">
                                             <CardBody className="text-center">
                                                 <h4 className="py-1 mb-0">Infiniti Free Plan</h4>
-                                                <p className="pt-1">₹ 0.00</p>
+                                                <p className="pt-1">{userPermission?.currencySymbol} 0.00</p>
                                                 <p className="py-1 text-white bg-dark w-50 rounded-3 mx-auto mb-0 cursor-pointer">Buy Now</p>
                                             </CardBody>
                                         </Card>
@@ -195,7 +197,7 @@ const Pricing = () => {
                                         <Card className="border-1">
                                             <CardBody className="text-center">
                                                 <h4 className="py-1 mb-0">Infiniti Lite</h4>
-                                                <p className="pt-1">₹ 999.00</p>
+                                                <p className="pt-1">{userPermission?.currencySymbol} 999.00</p>
                                                 <p className="py-1 text-white bg-dark w-50 rounded-3 mx-auto mb-0 cursor-pointer" >Buy Now</p>
                                             </CardBody>
                                         </Card>

@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Edit2, Percent, PlusCircle, X } from 'react-feather'
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap'
+import { PermissionProvider } from '../../../Helper/Context'
 
 const OfferSection = ({ value_type, handleModal, modal, cTAURL, setCTAURL }) => {
+    const { userPermission } = useContext(PermissionProvider)
     const [modalValue, setModalValue] = useState("")
 
     const [modalCode, setModalCode] = useState("")
@@ -56,7 +58,7 @@ const OfferSection = ({ value_type, handleModal, modal, cTAURL, setCTAURL }) => 
                             <div className="form-group">
                                 <label htmlFor="value">{value_type === "fixed_amount" ? "Flat OFF" : "Percentage OFF"}</label>
                                 <div className="position-relative form-control d-flex align-items-center">
-                                    {value_type === "fixed_amount" && <span style={{ fontSize: "15px" }}>₹</span>}<input type="text" className='flex-grow-1 from-control-offer' style={{ outline: "none", border: 'none', boxShadow: "none", padding: '0px' }} value={tempValue} onChange={(event) => {
+                                    {value_type === "fixed_amount" && <span style={{ fontSize: "15px" }}>{userPermission?.currencySymbol}</span>}<input type="text" className='flex-grow-1 from-control-offer' style={{ outline: "none", border: 'none', boxShadow: "none", padding: '0px' }} value={tempValue} onChange={(event) => {
                                         if (!isNaN(event.target.value)) {
                                             setTempValue(event.target.value)
                                         }

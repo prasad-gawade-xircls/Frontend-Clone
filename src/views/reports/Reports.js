@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Col, Row, Card, CardBody, Dropdown, DropdownToggle, DropdownMenu, Container } from 'reactstrap'
 import { BsCashStack, BsFillCreditCard2BackFill } from "react-icons/bs"
 import { TiTick } from "react-icons/ti"
 import { getReq, postReq } from '../../assets/auth/jwtService'
 import Spinner from '../Components/DataTable/Spinner'
 import { Link } from 'react-router-dom'
+import { PermissionProvider } from '../../Helper/Context'
 
 const Reports = () => {
-
+    const { userPermission } = useContext(PermissionProvider)
     const [totalCount, setTotalCount] = useState({})
     const [partnerCount, setPartnerCount] = useState({})
     const [ownCount, setOwnCount] = useState({})
@@ -265,7 +266,7 @@ const Reports = () => {
                         <CardBody className=' d-flex justify-content-between' style={{ height: `100px` }}>
                             <div>
                                 <h5>Revenue Earned</h5>
-                                <h3 className=' fw-bolder'>{isTotalCount ? <><Spinner size={'25px'} /></> : <Link to="/merchant/reports/total_revenue/">₹{totalCount?.totalrevenueearned}</Link>}</h3>
+                                <h3 className=' fw-bolder'>{isTotalCount ? <><Spinner size={'25px'} /></> : <Link to="/merchant/reports/total_revenue/">{userPermission?.currencySymbol}{totalCount?.totalrevenueearned}</Link>}</h3>
                             </div>
                             <div className='logo logoIssued d-flex justify-content-center align-items-center fs-4 border rounded-5 '>
                                 <TiTick />
@@ -349,7 +350,7 @@ const Reports = () => {
                         <CardBody className=' d-flex justify-content-between' style={{ height: `100px` }}>
                             <div>
                                 <h5>Revenue Earned</h5>
-                                <h3 className=' fw-bolder'>{ispartnerCount ? <><Spinner size={'25px'} /></> : <Link to="">₹{partnerCount?.partnerrevenueearned}</Link>}</h3>
+                                <h3 className=' fw-bolder'>{ispartnerCount ? <><Spinner size={'25px'} /></> : <Link to="">{userPermission?.currencySymbol}{partnerCount?.partnerrevenueearned}</Link>}</h3>
                             </div>
                             <div className='logo logoIssued d-flex justify-content-center align-items-center fs-4 border rounded-5 '>
                                 <TiTick />
@@ -431,7 +432,7 @@ const Reports = () => {
                         <CardBody className=' d-flex justify-content-between' style={{ height: `100px` }}>
                             <div>
                                 <h5>Revenue Earned</h5>
-                                <h3 className=' fw-bolder'>{isownCount ? <><Spinner size={'25px'} /></> : <Link to="">₹{ownCount?.ownrevenueearned}</Link>}</h3>
+                                <h3 className=' fw-bolder'>{isownCount ? <><Spinner size={'25px'} /></> : <Link to="">{userPermission?.currencySymbol}{ownCount?.ownrevenueearned}</Link>}</h3>
                             </div>
                             <div className='logo logoIssued d-flex justify-content-center align-items-center fs-4 border rounded-5 '>
                                 <TiTick />
@@ -510,7 +511,7 @@ const Reports = () => {
                         <CardBody className=' d-flex justify-content-between' style={{ height: `100px` }}>
                             <div>
                                 <h5>Revenue Earned</h5>
-                                <h3 className=' fw-bolder'>₹0</h3>
+                                <h3 className=' fw-bolder'>{userPermission?.currencySymbol}0</h3>
                             </div>
                             <div className='logo logoIssued d-flex justify-content-center align-items-center fs-4 border rounded-5 '>
                                 <TiTick />

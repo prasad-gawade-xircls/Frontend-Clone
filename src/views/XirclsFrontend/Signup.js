@@ -137,6 +137,9 @@ const Signup = () => {
                     // setShowError(false)
                     const formData = new FormData()
                     Object.entries(data).map(([key, value]) => formData.append(key, value))
+                    if (localStorage.getItem('aft_no')) {
+                        formData.append("aft_no", localStorage.getItem('aft_no'))
+                    }
                     console.log(formData)
                     postReq("signup", formData)
                     .then((res) => {

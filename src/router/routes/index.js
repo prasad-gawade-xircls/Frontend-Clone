@@ -30,7 +30,7 @@ import Admin_Routes from './Admin'
 import Profile_Routes from './Profile'
 import Referral_Routes from './Referral'
 import FlashAccounts_Routes from './FlashAccounts'
-import ReportsApp_Routes from './ReportsApp'
+import { ProductReview_Routes } from './ProductReviews'
 
 const getLayout = {
   blank: <BlankLayout />,
@@ -83,7 +83,7 @@ const Routes = [
   ...FlashAccounts_Routes,
   ...Xircls_Frontend_Routes,
   ...Profile_Routes,
-  ...ReportsApp_Routes
+  ...ProductReview_Routes
 ]
 // if (app_name && Routess[app_name]) {
 //   Routes = [

@@ -6,7 +6,6 @@ import TotalRevenue from '../../views/reports/TotalRevenue'
 import IncentiveViewTotal from '../../views/reports/IncentiveViewTotal'
 import IncentiveViewPartners from '../../views/reports/IncentiveViewPartners'
 import IncentiveViewOwn from '../../views/reports/IncentiveViewOwn'
-// import DetailAnalytics from '../../views/reports/detailAnalytics'
 import AcquisitionReports from '../../views/reports/AcquisitionReports'
 import RetentionReports from '../../views/reports/RetentionReports'
 import OffersIssuedToPartner from '../../views/reports/OffersIssuedToPartner'
@@ -15,9 +14,6 @@ import PartnerClicksReports from '../../views/reports/PartnerClicksReports'
 import OwnClicksReports from '../../views/reports/OwnClicksReports'
 import PartnerRedemptions from '../../views/reports/PartnerRedemptions'
 import OwnRedemptions from '../../views/reports/OwnRedemptions'
-// import TestSignUp from '../../views/reports/TestSignUp'
-// import TestLogin from '../../views/reports/TestLogin'
-// import SignupLink from '../../views/reports/SignupLink'
 const Reports = lazy(() => import('../../views/reports/Reports'))
 const ThankYouPage = lazy(() => import('../../views/reports/ThankYouPage'))
 const PvaReports = lazy(() => import('../../views/reports/PvaReports'))
@@ -101,22 +97,6 @@ const Reports_Routes = [
     path: "/merchant/reports/offers_issued_to_own/",
     element: <OffersIssuedToOwn />
   }
-  // {
-  //   path: "/merchant/reports/detailAnalytics/",
-  //   element: <DetailAnalytics />
-  // }
-  // {
-  //   path: "/merchant/testsignup",
-  //   element: <TestSignUp/>
-  // },
-  // {
-  //   path: "/merchant/testlogin",
-  //   element: <TestLogin/>
-  // },
-  // {
-  //   path: "/merchant/signuplink",
-  //   element: <SignupLink/>
-  // }
 ]
 
-export default Reports_Routes    
+export default Reports_Routes

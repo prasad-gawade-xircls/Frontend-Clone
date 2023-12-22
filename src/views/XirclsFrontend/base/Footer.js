@@ -27,12 +27,25 @@ const Footer = () => {
                                     </Link>
                                     <p className="mt-2 mb-1 eigth-font-footer lh-md-small">The World's First Decentralized Collaborative <br /> Marketing Network </p>
                                 </Col >
+                                <Col md={12}>
+                                    <div className="ninth-font text-white mb-1">
+                                        XIRCLS is a registered trademark of ALTISSADVANCE TECH PVT. LTD.
+                                    </div>
+                                </Col>
                                 <Col md={12} className="mb-1 eighth-font-footer">
                                     <strong className="sixth-font-nav">HQ</strong> <br />
                                     G-08, The Summit Business Bay by Omkar, <br />
                                     Andheri (East), <br />
                                     Mumbai - 400093
                                 </Col >
+
+                                <Col md={12} className="mb-1 eighth-font-footer">
+                                    <strong className="sixth-font-nav">Registered Address</strong> <br />
+                                    Mahim House, Chhatrapati Shivaji Maharaj Marg, <br /> 
+                                    New Mogal Lane, <br /> 
+                                    Mahim, Mumbai - 400016
+                                </Col >
+
                                 <Col md={12}>
                                     <img className="me-1" src={ind} width={20} alt="" />
                                     +91 9969 333 666 <br />
@@ -139,11 +152,7 @@ const Footer = () => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col md={4}>
-                            <div className="ninth-font">
-                                XIRCLS is a registered trademark of ALTISSADVANCE TECH PVT. LTD.
-                            </div>
-                        </Col>
+                        
                         <Col md={4} className='ninth-font text-center'>
                             Copyright © 2022 All Rights Reserved. AltissAdvance Tech Private <br /> Limited
                             <div className="d-flex justify-content-center">

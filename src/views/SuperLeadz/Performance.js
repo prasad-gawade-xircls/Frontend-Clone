@@ -1,40 +1,15 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import ComTable from "../Components/DataTable/ComTable"
 import CardCom from "../Components/SuperLeadz/CardCom"
-import { Col, Input, Row, Card, CardBody } from "reactstrap"
+import { Col, Input } from "reactstrap"
 import moment from "moment/moment"
 import { getCurrentOutlet } from "../Validator"
 import { SuperLeadzBaseURL, baseURL } from "../../assets/auth/jwtService"
 import Spinner from "../Components/DataTable/Spinner"
-import { User, BarChart2, RefreshCw, DollarSign, Info, Menu, UserPlus, UserCheck, Users, Percent, Check } from 'react-feather'
-import { SiConvertio } from "react-icons/si"
-import { AiFillPhone, AiOutlineMail, AiFillCaretRight, AiOutlineQuestion } from 'react-icons/ai'
-import { BiDollar } from "react-icons/bi"
-import "./css/Dashboard.css"
-import SuperLeadzCampaign from '../Apps/SuperLeadzCampaign'
-import AllCampaigns from '../NewCustomizationFlow/AllCampaigns'
-import { PermissionProvider } from '../../Helper/Context'
-import Flatpickr from 'react-flatpickr'
+import { PermissionProvider } from "../../Helper/Context"
 
 export default function SuperLeadzPerformance() {
-    const [chargesLoader, setChargesLoader] = useState(true)
-    const [performanceData, setPerformanceData] = useState({
-        active_campaign: "0",
-        campaign_revenue: "0",
-        impressions: "0",
-        engaged: "0",
-        leadsGenerated: "0",
-        uniqueLeadsGenerated: "0",
-        verifiedLeads: "0",
-        uniqueVerifiedLeads: "0",
-        vists: "0",
-        vistsToLead: "0",
-        leadConverted: "0.00",
-        leadToCustomer: "0.00"
-
-    })
-
-    console.log(setChargesLoader, setPerformanceData)
+    const { userPermission } = useContext(PermissionProvider)
     // const moment = require("moment")
     const [tableData, setTableData] = useState([])
     const [isLoading, setIsLoading] = useState(true)
@@ -219,11 +194,6 @@ export default function SuperLeadzPerformance() {
     </>
     const columns = [
         {
-            name: "Sr. No.",
-            width: "7.5%",
-            cell: (row, index) => index + 1
-        },
-        {
             name: "Date",
             width: "25%",
             selector: (row) => moment(row.codeDiscount.createdAt).format('ddd, D MMM YYYY h:mm:ss')
@@ -292,7 +262,7 @@ export default function SuperLeadzPerformance() {
                     <CardCom
                         icon={<img src="https://cdn-icons-png.flaticon.com/512/1773/1773345.png" width="25px" />}
                         title="Total Revenue"
-                        data={offerData?.isOfferData ? `₹${offerData?.revenue}` : <Spinner size={'25px'} />}
+                        data={offerData?.isOfferData ? `${userPermission?.currencySymbol}${Number(offerData?.revenue).toFixed(2)}` : <Spinner size={'25px'} />}
                         info={`Total earnings`}
                     />
                 </div>
@@ -357,104 +327,7 @@ export default function SuperLeadzPerformance() {
                     />
                 </div>
             </div>
-            <Row className='match-height'>
-                {/* <Col md="3">
-                    <CardCom icon={<img src='https://cdn-icons-png.flaticon.com/512/1773/1773345.png' width='25px' />} title="Revenue" data={isRevenue ? `₹${totalRevenue}` : '₹0.00'} info={'Total earnings'} />
-                </Col> */}
 
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-default'>
-                    <CardCom icon={<Check width={'20px'}/>} title={<div style={{marginTop: "-14px"}}>Average Order <br/> Value</div>} data={!isLoading ? performanceData.active_campaign : <Spinner size={'25px'} />} info={`The ratio of leads who convert to customers`} />
-                </div>
-
-                <Col className='col-md-6 col-xl-4 col-xxl-3 cursor-default'>
-                    <CardCom icon={<img src='https://cdn-icons-png.flaticon.com/512/1773/1773345.png' width='25px' />} title={<div style={{marginTop: "-2vh"}}>Campaign <br/> Revenue</div>} data={<div>{!isLoading ? `₹${performanceData.campaign_revenue}` : <Spinner size={'25px'} />}</div>} />
-                </Col>
-
-                <Col md="6" className='d-none'>
-                    <Card>
-                        <CardBody>
-                            {
-                                chargesLoader ? <div className='d-flex justify-content-center align-items-center'><Spinner width='45px' /></div> : billing?.mainData.length === 0 ? <>
-                                    <div className=" d-flex flex-column normal-card text-center">
-                                        <h5>No Plan Purchased</h5>
-                                        <div className='mt-1'>
-                                            <Link to="/merchant/SuperLeadz/joinus/" className='btn btn-primary'>BUY NOW</Link>
-                                        </div>
-                                    </div>
-                                </> : <>
-                                    <div className="normal-card">
-                                        <div className='d-flex justify-content-between align-items-center flex-grow-1 w-100 mb-2'>
-                                            {/* <img width={"25px"} src="https://static.vecteezy.com/system/resources/previews/000/512/317/non_2x/vector-wallet`-glyph-black-icon.jpg" alt="" /> */}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                                            <button onClick={() => {
-                                                navigate("/merchant/SuperLeadz/joinus/", { state: billing?.price })
-                                            }} className='btn btn-sm btn-success text-white'>Upgrade</button>
-                                        </div>
-                                        {
-                                            chargesLoader ? <div className='d-flex justify-content-center align-items-center'><Spinner width='45px' /></div> : <div className="d-flex justify-content-between align-items-center w-100">
-                                                <h4 style={{ borderBottom: '0px dotted lightgray', fontSize: '18px', position: "relative", cursor: 'pointer' }}>{<p style={{ color: "" }}>Your Current PLan is <span style={{ color: "#48a441", textTransform: 'capitalize' }}>{billing?.mainData[0]?.plan_id}</span></p>}<span className='position-absolute cursor-pointer' title={`Plan that you have subscribed to`} style={{ top: '-8px', right: '-16px' }}></span></h4>
-                                                <div className='d-flex gap-3 align-items-center'>
-                                                    <p className='position-relative' style={{ fontSize: `0.85rem`, borderBottom: '0.5px dotted lightgray;', cursor: 'pointer' }} onClick={() => navigate('/leads')}>{"Pop-ups - "}</p>
-                                                    <h5 style={{ fontSize: `3rem`, cursor: "default" }}>{`${billing?.usage_count}/${billing?.usage_charge}`}</h5>
-                                                </div>
-                                            </div>
-                                        }
-
-                                    </div>
-                                </>
-                            }
-
-                        </CardBody>
-                    </Card>
-                </Col>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-default'>
-                    <CardCom icon={<Check width={'25px'} />} title={<div style={{marginTop: "-30px"}}>Impressions</div>} data={!isLoading ? performanceData.impressions : <Spinner size={'25px'} />} info={`The ratio of leads who convert to customers`} />
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-default'>
-                    <CardCom icon={<Check width={'25px'} />} title={<div style={{marginTop: "-30px"}}>Engagement</div>} data={!isLoading ? performanceData.engaged : <Spinner size={'25px'} />} info={`The ratio of leads who convert to customers`} />
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-pointer'>
-                    <CardCom icon={<UserPlus width={'25px'} />} title={<div style={{marginTop: "-14px"}}>Lead Opportunities <br/> Generated</div>} data={!isLoading ? performanceData?.leadsGenerated : <Spinner size={'25px'} />} info={`Total visitors who've submitted their contact information via a SuperLeadz pop-up`} />
-
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-pointer'>
-                    <CardCom icon={<UserPlus width={'25px'} />} title={<div style={{marginTop: "-30px"}}>Leads Generated</div>} data={!isLoading ? performanceData?.uniqueLeadsGenerated : <Spinner size={'25px'} />} info={`Total visitors who've submitted their contact information via a SuperLeadz pop-up`} />
-
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-pointer'>
-                    <CardCom icon={<UserCheck width={'25px'} />} title={<div style={{marginTop: "-14px"}}>Verified Lead <br/> Opportunities</div>} data={!isLoading ? performanceData?.verifiedLeads : <Spinner size={'25px'} />} info={`Total leads who've verified their contact information via OTP authentication`} />
-
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-pointer'>
-                    <CardCom icon={<UserCheck width={'25px'} />} title={<div style={{marginTop: "-30px"}}>Verified Leads</div>} data={!isLoading ? performanceData?.uniqueVerifiedLeads : <Spinner size={'25px'} />} info={`Total leads who've verified their contact information via OTP authentication`} />
-
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-pointer'>
-                    <CardCom icon={<User width={'25px'} />} title={<>Visits</>} data={!isLoading ? performanceData?.vists : <Spinner size={'25px'} />} info={`Total website traffic (since SuperLeadz was installed - July 15th, 2023 3:55pm)`} />
-
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-default'>
-                    <CardCom icon={<Users width={'25px'} />} title={<div style={{marginTop: "-14px"}}>Visitor-to-Lead <br /> Conversion Rate</div>} data={!isLoading ? `${performanceData?.vistsToLead}%` : <Spinner size={'25px'} />} info={`Proportion of visitors to your website who convert to self-qualified leads`} />
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-pointer'>
-                    <CardCom icon={<SiConvertio size={'25px'} />} title="Leads Converted" data={!isLoading ? performanceData.leadConverted : <Spinner size={'25px'} />} info={`Total leads who redeemed their discount`} />
-                </div>
-
-                <div className='col-md-6 col-xl-4 col-xxl-3 cursor-default'>
-                    <CardCom icon={<Percent width={'25px'} />} title={<div style={{marginTop: "-14px"}}>Lead-to-Customer <br /> Conversion Rate</div>} data={!isLoading ? `${performanceData?.leadToCustomer}%` : <Spinner size={'25px'} />} info={`The ratio of leads who convert to customers`} />
-                </div>
-
-            </Row>
-            
             <section>
                 <div className="card">
                     <div className="card-body">
@@ -466,6 +339,8 @@ export default function SuperLeadzPerformance() {
                             filteredData={filteredData}
                             isLoading={isLoading}
                             paginationPerPage={7}
+                            isExport={true}
+                            exportUrl={`${SuperLeadzBaseURL}/api/get/getdisc/`}
                         />
                     </div>
                 </div>

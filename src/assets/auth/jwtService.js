@@ -2,14 +2,14 @@ import axios from "axios"
 import { getToken, removeToken, setToken } from "./auth"
 import jwtDecode from "jwt-decode"
 
-// export const baseURL = "https://api.demo.xircls.in"
-// export const SuperLeadzBaseURL = "https://apps.demo.xircls.in"
-// export const crmURL = "https://crm.xircls.in"
+export const baseURL = "https://api.demo.xircls.in"
+export const SuperLeadzBaseURL = "https://apps.demo.xircls.in"
+export const crmURL = "https://crm.xircls.in"
 
 // Live 
-export const baseURL = "https://api.xircls.com"
-export const SuperLeadzBaseURL = "https://apps.xircls.com"
-export const crmURL = "https://crm.xircls.in"
+// export const baseURL = "https://api.xircls.com"
+// export const SuperLeadzBaseURL = "https://apps.xircls.com"
+// export const crmURL = "https://crm.xircls.in"
 
 export const configUrl = {
 
@@ -27,7 +27,7 @@ export const configUrl = {
     outletType: "/merchant/choose-outlet-type/",
     getCategory: "/merchant/categories/",
     saveOutletDetails: "/merchant/create-outlet/",
-    networkDashboard: "/merchant/xircls/networks-dashboard/",
+    networkDashboard : "/merchant/xircls/networks-dashboard/",
     addPlanDetails: "/merchant/xircls/make-a-xircls/",
     getDashboardData: "/dashboard/add_count_dash/",
     getDashboardCampaginDetails: "/dashboard/current_campaign/",
@@ -109,6 +109,7 @@ export const configUrl = {
     createSupportTicket: "/support-system/create-support-ticket/",
     editSupportTicket: "/support-system/ticket-records/",
     supperLeadzBilling: "/auth_merchant/api/v1/get_transactions/",
+    thankYouSetting: "/merchant/activate/thankyou_page/",
     // contactMerchant: "merchant/api/contact_us_merchant/",
     //SuperLeadz
     planSubscription: "/merchant/subscriptions/plan_subcription_shopify/",
@@ -116,10 +117,8 @@ export const configUrl = {
     addOffers: "/add_offer/",
     //referal
     referalPoints: "/referral/referralpoints/",
+    affiliate_dashboard: "/affiliate/wallet_transaction/"
     // Flash Account 
-    
-    //analyatics
-    getAnalyticsData: "/alltimessales/"
 }
 
 const axiosInstance = axios.create({

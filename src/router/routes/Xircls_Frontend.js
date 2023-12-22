@@ -58,7 +58,7 @@ const Xircls_Frontend_Routes = [
     }
   },
   {
-    path: '/merchant/signup',
+    path: '/merchant/signup/',
     element: <Signup />,
     meta: {
       layout: 'blank',

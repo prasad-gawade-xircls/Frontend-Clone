@@ -4,6 +4,7 @@ import UserDropdown from './UserDropdown'
 import { PermissionProvider } from '../../../../Helper/Context'
 import { getReq } from '../../../../assets/auth/jwtService'
 import { Link, useNavigate } from 'react-router-dom'
+import countries from '../../../../views/NewFrontBase/Country'
 // import NavbarSearch from './NavbarSearch'
 // import { FaLayerGroup } from 'react-icons/fa'
 // import { useNavigate } from 'react-router-dom'
@@ -27,6 +28,12 @@ const NavbarUser = ({disableName}) => {
       // } else {
       //   name = resp.data.installed_apps[0]
       // }
+
+      const currentOutlet = userPermission?.multipleDomain?.filter((curElem) => curElem.api_key === userPermission?.apiKey)
+      // console.log(currentOutlet, "currentOutlet")
+      const symbol = currentOutlet[0]?.outlet_currency ? currentOutlet[0]?.outlet_currency : "AFN"
+      const merchantCurrency = countries.filter((curElem) => curElem?.currency?.code === symbol)
+
       if (resp.data.installed_apps.includes(userPermission?.appName)) {
         name = userPermission?.appName
       } else {
@@ -37,7 +44,8 @@ const NavbarUser = ({disableName}) => {
       const updatedPermission = {
         appName: name,
         installedApps: resp.data.installed_apps,
-        campaign: resp?.data?.status
+        campaign: resp?.data?.status,
+        currencySymbol: merchantCurrency[0]?.currency?.symbol
       }
 
       setUserPermission((curElem) => ({

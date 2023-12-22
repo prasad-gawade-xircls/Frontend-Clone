@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, useEffect } from 'react'
+import { Fragment, useCallback } from 'react'
 // ** Third Party Components
 import ReactPaginate from 'react-paginate'
 import { ArrowLeft, ChevronDown } from 'react-feather'
@@ -12,7 +12,7 @@ import Spinner from './Spinner'
 // import { Link } from 'react-router-dom'
 // import { pageNo } from '../../Validator'
 
-const ServerSideTable = ({ tableCol, data, isLoading, content, currentPage, setCurrentPage, currentEntry, count, isStyling, getAllThemes, advanceData }) => {
+const ServerSideTable = ({ tableCol, data, isLoading, content, currentPage, setCurrentPage, currentEntry, count, isStyling, selectableRows = false, setSelectedRows }) => {
   // ** State
   // const [currentPage, setCurrentPage] = useState(0)
   // const [currentEntry, setCurrentEntry] = useState(10)
@@ -89,27 +89,12 @@ const ServerSideTable = ({ tableCol, data, isLoading, content, currentPage, setC
     }
   }
 
-  console.log("currentEntry", currentEntry)
+  const handleRowSelected = useCallback(state => {
 
-  useEffect(() => {
-    if (advanceData) {
-      const delay = 1000
-      const request = setTimeout(() => {
-        getAllThemes()
-      }, delay)
-
-      return () => {
-        clearTimeout(request)
-      }
-    }
-  }, [advanceData])
-
-
-  useEffect(() => {
-    getAllThemes()
+    setSelectedRows(state.selectedRows.map((curElem) => curElem.id))
   }, [])
 
-
+  console.log("currentEntry", currentEntry)
   return (
     <>
       {content}
@@ -118,7 +103,6 @@ const ServerSideTable = ({ tableCol, data, isLoading, content, currentPage, setC
           key={currentEntry}
           pagination
           customStyles={!isStyling ? customStyles : {}}
-          selectableRowsNoSelectAll
           columns={tableCol}
           className='react-dataTable'
           paginationPerPage={currentEntry ? currentEntry : 7}
@@ -128,6 +112,8 @@ const ServerSideTable = ({ tableCol, data, isLoading, content, currentPage, setC
           data={Array.isArray(data) ? data : []}
           progressPending={isLoading}
           progressComponent={<Spinner size="40px" />}
+          selectableRows={selectableRows}
+          onSelectedRowsChange={handleRowSelected}
         />}
 
       </div>

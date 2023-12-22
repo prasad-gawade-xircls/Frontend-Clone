@@ -20,6 +20,7 @@ import { PermissionProvider } from '../../Helper/Context'
 import Flatpickr from 'react-flatpickr'
 
 function SuperLeadzDashboard() {
+    const { userPermission } = useContext(PermissionProvider)
     const [performanceData, setPerformanceData] = useState({
         active_campaign: "0",
         campaign_revenue: "0",
@@ -41,7 +42,6 @@ function SuperLeadzDashboard() {
     const [chargesLoader, setChargesLoader] = useState(true)
     const [toLoadCampaign, setToLoadCampaign] = useState(false)
     const [cancel, setCancel] = useState(false)
-    const { userPermission } = useContext(PermissionProvider)
     // const currentDate = moment()
     const [selectedData, setSelectedData] = useState([moment(new Date()).subtract(7, 'd').format('YYYY-MM-DD'), moment(new Date()).format('YYYY-MM-DD')])
     const [filterType, setSetFilterType] = useState("week")
@@ -92,12 +92,12 @@ function SuperLeadzDashboard() {
     const outletData = getCurrentOutlet()
 
     const options = [
-        { value: "all", label: "Lifetime" },
-        { value: "today", label: "Today" },
-        { value: "week", label: "This Week" },
-        { value: "month", label: "This Month" },
-        { value: "year", label: "This Year" },
-        { value: "custom", label: "Custom" }
+        {value: "all", label: "Lifetime"},
+        {value: "today", label: "Today"},
+        {value: "week", label: "This Week"},
+        {value: "month", label: "This Month"},
+        {value: "year", label: "This Year"},
+        {value: "custom", label: "Custom"}
     ]
 
     const campaignData = userPermission?.campaign ? userPermission?.campaign?.filter((cur) => {
@@ -132,32 +132,32 @@ function SuperLeadzDashboard() {
             method: 'POST',
             body: form_data
         })
-            .then((resp) => resp.json())
-            .then((data) => {
-                const updatedData = {
-                    active_campaign: data?.active_campaign ? data?.active_campaign : "0",
-                    campaign_revenue: data?.campaign_revenue ? data?.campaign_revenue : "0",
-                    impressions: data?.impression ? data?.impression : "0",
-                    engaged: data?.engagment ? data?.engagment : "0",
-                    leadsGenerated: data?.leads[0]?.totalLeads ? data?.leads[0]?.totalLeads : "0",
-                    uniqueLeadsGenerated: data?.leads[0]?.uniqueLeads ? data?.leads[0]?.uniqueLeads : "0",
-                    verifiedLeads: data?.leads[0]?.verifiedLeads ? data?.leads[0]?.verifiedLeads : "0",
-                    uniqueVerifiedLeads: data?.leads[0]?.uniqueVerifiedLeads ? data?.leads[0]?.uniqueVerifiedLeads : "0",
-                    vists: data?.total_visit ? data?.total_visit : "0",
-                    vistsToLead: data?.leads[0]?.totalLeads && data?.total_visit ? Number(data?.leads[0]?.totalLeads / data?.total_visit * 100).toFixed(2) : "0.00",
-                    leadConverted: data?.lead_converted ? data?.lead_converted : "0",
-                    leadToCustomer: data?.lead_converted && data?.leads[0]?.verifiedLeads ? Number(data?.lead_converted / data?.leads[0]?.verifiedLeads * 100).toFixed(2) : "0.00"
-                }
-                setPerformanceData((preData) => ({
-                    ...preData,
-                    ...updatedData
-                }))
-                setIsLoading(false)
-            })
-            .catch((error) => {
-                console.log(error)
-                setIsLoading(false)
-            })
+        .then((resp) => resp.json())
+        .then((data) => {
+            const updatedData = {
+                active_campaign: data?.active_campaign ? data?.active_campaign : "0",
+                campaign_revenue: data?.campaign_revenue ? data?.campaign_revenue : "0",
+                impressions: data?.impression ? data?.impression : "0",
+                engaged: data?.engagment ? data?.engagment : "0",
+                leadsGenerated: data?.leads[0]?.totalLeads ? data?.leads[0]?.totalLeads : "0",
+                uniqueLeadsGenerated: data?.leads[0]?.uniqueLeads ? data?.leads[0]?.uniqueLeads : "0",
+                verifiedLeads: data?.leads[0]?.verifiedLeads ? data?.leads[0]?.verifiedLeads : "0",
+                uniqueVerifiedLeads: data?.leads[0]?.uniqueVerifiedLeads ? data?.leads[0]?.uniqueVerifiedLeads : "0",
+                vists: data?.total_visit ? data?.total_visit : "0",
+                vistsToLead: data?.leads[0]?.totalLeads && data?.total_visit ? Number(data?.leads[0]?.totalLeads / data?.total_visit * 100).toFixed(2) : "0.00",
+                leadConverted: data?.lead_converted ? data?.lead_converted : "0",
+                leadToCustomer: data?.lead_converted && data?.leads[0]?.verifiedLeads ? Number(data?.lead_converted / data?.leads[0]?.verifiedLeads * 100).toFixed(2) : "0.00"
+            }
+            setPerformanceData((preData) => ({
+                ...preData,
+                ...updatedData
+            }))
+            setIsLoading(false)
+        })
+        .catch((error) => {
+            console.log(error)
+            setIsLoading(false)
+        })
     }
 
     useEffect(() => {
@@ -394,7 +394,7 @@ function SuperLeadzDashboard() {
                                         <img src={mainLogo} height={64} width={64} style={{ borderRadius: "100%", border: "solid 1px #afafaf" }} />
                                     </div>
                                     <div className="text-center text-sm-start">
-                                        <h3 className='text-black'>Hey, {outletData[0]?.outlet_name}! Need a sidekick?</h3>
+                                        <h3 className='text-black'>Hey, {userPermission?.currencySymbol_name}! Need a sidekick?</h3>
                                         <h6 className='SmallTxt'>Our team will help you set up your campaign for out-of-this-world results!</h6>
                                         <div className='mt-2 d-flex justify-content-start gap-1'>
                                             <Link to='/merchant/SuperLeadz/' className='shedule_btn btn btn-sm btn-primary btnCustom text-nowrap' style={{ width: "140px" }}>
@@ -424,80 +424,80 @@ function SuperLeadzDashboard() {
                 {
                     (campaignData[0]?.status === 0 || campaignData[0]?.status === "0") ? (
                         <>
-                            <div className="col-md-4 d-none">
-                                <Card>
-                                    <CardBody>
-                                        <div className="row">
-                                            <div className="d-flex justify-content-start align-items-start gap-1">
-                                                <div className="text-center text-sm-start">
-                                                    <h3 className='text-black'>{outletData[0]?.outlet_name}, we’d love to help!</h3>
-                                                    <h6 className='SmallTxt'>Let our team assist you with your first campaign</h6>
-                                                    <div className='mt-2 d-flex justify-content-start gap-1'>
-                                                        <Link to='/merchant/SuperLeadz/' className='shedule_btn btn btn-sm btn-primary btnCustom text-nowrap' style={{ width: "140px" }}>
-                                                            <AiFillPhone size={14} style={{ marginBottom: "2px" }} />
-                                                            <span className='boxPadbtn' style={{ fontSize: "11px" }}>Schedule a Call</span>
-                                                        </Link>
+                            <div className='d-none'>
+                                <div className="col-md-4">
+                                    <Card>
+                                        <CardBody>
+                                            <div className="row">
+                                                <div className="d-flex justify-content-start align-items-start gap-1">
+                                                    <div className="text-center text-sm-start">
+                                                        <h3 className='text-black'>{userPermission?.currencySymbol_name}, we’d love to help!</h3>
+                                                        <h6 className='SmallTxt'>Let our team assist you with your first campaign</h6>
+                                                        <div className='mt-2 d-flex justify-content-start gap-1'>
+                                                            <Link to='/merchant/SuperLeadz/' className='shedule_btn btn btn-sm btn-primary btnCustom text-nowrap' style={{ width: "140px" }}>
+                                                                <AiFillPhone size={14} style={{ marginBottom: "2px" }} />
+                                                                <span className='boxPadbtn' style={{ fontSize: "11px" }}>Schedule a Call</span>
+                                                            </Link>
 
-                                                        <Link to='/merchant/SuperLeadz/' className=' btn btn-sm btn-primary btnCustom text-nowrap' style={{ width: "140px" }}>
-                                                            <AiOutlineMail size={14} style={{ marginBottom: "2px" }} />
-                                                            <span className='boxPadbtn' style={{ fontSize: "11px" }}>Email Us</span>
-                                                        </Link>
+                                                            <Link to='/merchant/SuperLeadz/' className=' btn btn-sm btn-primary btnCustom text-nowrap' style={{ width: "140px" }}>
+                                                                <AiOutlineMail size={14} style={{ marginBottom: "2px" }} />
+                                                                <span className='boxPadbtn' style={{ fontSize: "11px" }}>Email Us</span>
+                                                            </Link>
 
-                                                        {/* <Link to='/merchant/create_support/' className=' btn btn-sm btn-primary btnCustom text-nowrap' style={{width:"140px"}}>
+                                                            {/* <Link to='/merchant/create_support/' className=' btn btn-sm btn-primary btnCustom text-nowrap' style={{width:"140px"}}>
                                                                 <AiOutlineMail size={14} style={{marginBottom:"2px"}}/>
                                                                 <span className='boxPadbtn' style={{fontSize:"11px"}}>Support</span>
                                                             </Link> */}
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            </div>
-                            <div className="col-md-8 d-none">
-                                <Card>
-                                    <CardBody>
-
-                                        <div className="left_side d-flex justify-content-between align-items-center mb-1">
-                                            <div className='bg-primary text-center rounded-right WidthAdjust' style={{ width: "425px", padding: "6px", marginLeft: '-25px' }}>
-                                                <h4 className='bb text-white m-0' style={{ fontSize: "16px" }}>Complete these steps to convert leads faster!</h4>
-                                            </div>
-                                            <div className="right d-none justify-content-end align-items-center gap-1">
-                                                <select className='form-control' style={{ width: '120px' }} onChange={(e) => setSetFilterType(e.target.value)}>
-                                                    {
-                                                        options.map((curElem) => {
-                                                            return <option value={curElem.value} selected={curElem.value === filterType}>{curElem.label}</option>
-                                                        })
-                                                    }
-
-                                                </select>
-
-                                                {
-                                                    filterType === "custom" ? (
-                                                        <div className="custom">
-                                                            <Flatpickr options={{ // Sets the minimum date as 14 days ago
-                                                                maxDate: "today", // Sets the maximum date as today
-                                                                mode: "range",
-                                                                dateFormat: "Y-m-d"
-                                                            }} className='form-control' value={selectedData} onChange={(date) => setSelectedData(date)} id='default-picker' placeholder='Search' />
-
                                                         </div>
-                                                    ) : ''
-                                                }
-                                            </div>
-                                        </div>
-                                        {/* <div className='cc text-center my-1 rounded-right ' style={{ width: "40px", padding: "6px", position: "absolute", left: "30px", top: "-1px", rotate: "290deg", zIndex: "-999", backgroundColor: "#4233ea" }}>
-                                            <h4 className='text-info'>Complete</h4>
-                                        </div> */}
-                                        <div className="row justify-content-start align-items-center flex-nowrap overflow-auto">
-                                            <SuperLeadzCampaign toLoadCampaign={toLoadCampaign} outletData={outletData} />
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            </div>
+                                                    </div>
 
-                            {/* Here */}
+                                                </div>
+                                            </div>
+                                        </CardBody>
+                                    </Card>
+                                </div>
+                                <div className="col-md-8">
+                                    <Card>
+                                        <CardBody>
+                                            
+                                            <div className="left_side d-flex justify-content-between align-items-center mb-1">
+                                                <div className='bg-primary text-center rounded-right WidthAdjust' style={{ width: "425px", padding: "6px", marginLeft: '-25px' }}>
+                                                    <h4 className='bb text-white m-0' style={{ fontSize: "16px" }}>Complete these steps to convert leads faster!</h4>
+                                                </div>
+                                                <div className="right d-none justify-content-end align-items-center gap-1">
+                                                    <select className='form-control' style={{ width: '120px' }} onChange={(e) => setSetFilterType(e.target.value)}>
+                                                        {
+                                                            options.map((curElem) => {
+                                                                return  <option value={curElem.value} selected={curElem.value === filterType}>{curElem.label}</option>
+                                                            })
+                                                        }
+                                                        
+                                                    </select>
+
+                                                    {
+                                                        filterType === "custom" ? (
+                                                            <div className="custom">
+                                                                <Flatpickr options={{ // Sets the minimum date as 14 days ago
+                                                                    maxDate: "today", // Sets the maximum date as today
+                                                                    mode: "range",
+                                                                    dateFormat: "Y-m-d"
+                                                                }} className='form-control' value={selectedData} onChange={(date) => setSelectedData(date)} id='default-picker' placeholder='Search' />
+
+                                                            </div>
+                                                        ) : ''
+                                                    }
+                                                </div>
+                                            </div>
+                                            {/* <div className='cc text-center my-1 rounded-right ' style={{ width: "40px", padding: "6px", position: "absolute", left: "30px", top: "-1px", rotate: "290deg", zIndex: "-999", backgroundColor: "#4233ea" }}>
+                                                <h4 className='text-info'>Complete</h4>
+                                            </div> */}
+                                            <div className="row justify-content-start align-items-center flex-nowrap overflow-auto">
+                                                <SuperLeadzCampaign toLoadCampaign={toLoadCampaign} outletData={outletData} />
+                                            </div>
+                                        </CardBody>
+                                    </Card>
+                                </div>
+                            </div>
                             <div className="col-md-12">
                                 <Card>
                                     <CardBody>
@@ -508,7 +508,7 @@ function SuperLeadzDashboard() {
                                             <div className='col-md-4'>
                                                 <div className='d-flex justify-content-center align-items-center h-100 gap-1'>
                                                     {/* <Link className="btn btn-primary" to="/merchant/SuperLeadz/"> Quick Set-Up</Link> */}
-                                                    <Link className="btn btn-primary-main" to="/merchant/SuperLeadz/themes/"> Create Campaign</Link>
+                                                    <Link className="btn btn-primary" to="/merchant/SuperLeadz/themes/"> Create Campaign</Link>
                                                 </div>
 
                                             </div>
@@ -518,20 +518,20 @@ function SuperLeadzDashboard() {
                                                         <select className='form-control' style={{ width: '120px' }} onChange={(e) => setSetFilterType(e.target.value)}>
                                                             {
                                                                 options.map((curElem) => {
-                                                                    return <option value={curElem.value} selected={curElem.value === filterType}>{curElem.label}</option>
+                                                                    return  <option value={curElem.value} selected={curElem.value === filterType}>{curElem.label}</option>
                                                                 })
                                                             }
-
+                                                        
                                                         </select>
 
                                                         {
                                                             filterType === "custom" ? (
-                                                                <div className="custom ">
+                                                                <div className="custom">
                                                                     <Flatpickr options={{ // Sets the minimum date as 14 days ago
                                                                         maxDate: "today", // Sets the maximum date as today
                                                                         mode: "range",
                                                                         dateFormat: "Y-m-d"
-                                                                    }} className='form-control' value={selectedData} onChange={(date) => setSelectedData(date)} id='default-picker' />
+                                                                    }} className='form-control' value={selectedData} onChange={(date) => setSelectedData(date)} id='default-picker' placeholder='Search' />
 
                                                                 </div>
                                                             ) : ''
@@ -572,7 +572,7 @@ function SuperLeadzDashboard() {
                                         <div className='col-md-4'>
                                             <div className='d-flex justify-content-center align-items-center h-100 gap-1'>
                                                 {/* <Link className="btn btn-primary" to="/merchant/SuperLeadz/"> Quick Set-Up</Link> */}
-                                                <Link className="btn btn-primary-main" to="/merchant/SuperLeadz/themes/"> Create Campaign</Link>
+                                                <Link className="btn btn-primary" to="/merchant/SuperLeadz/themes/"> Create Campaign</Link>
                                             </div>
 
                                         </div>
@@ -582,10 +582,10 @@ function SuperLeadzDashboard() {
                                                     <select className='form-control' style={{ width: '120px' }} onChange={(e) => setSetFilterType(e.target.value)}>
                                                         {
                                                             options.map((curElem) => {
-                                                                return <option value={curElem.value} selected={curElem.value === filterType}>{curElem.label}</option>
+                                                                return  <option value={curElem.value} selected={curElem.value === filterType}>{curElem.label}</option>
                                                             })
                                                         }
-
+                                                       
                                                     </select>
 
                                                     {
@@ -628,17 +628,17 @@ function SuperLeadzDashboard() {
             </div>
 
             <Row className='match-height'>
-
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default'>
-                    <CardCom icon={<Check width={'20px'} />} title={<>Remaining <br /> Pop-up views</>} data={!chargesLoader ? Number(billing?.usage_charge) - Number(billing?.usage_count) : <Spinner size={'25px'} />} info={`Total number of pop-ups (according to the plan) - number of pop-ups loaded on the website`} />
-                </div>
-
-                <Col className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default'>
-                    <CardCom icon={<img src='https://cdn-icons-png.flaticon.com/512/1773/1773345.png' width='25px' />} title="Campaign Revenue" info={'Sum Total Revenue through SuperLeadz Campaign'} data={!isLoading ? `₹${performanceData.campaign_revenue}` : <Spinner size={'25px'} />} />
+                
+                <Col className='col-md-6 cursor-default'>
+                    <CardCom icon={<img src='https://cdn-icons-png.flaticon.com/512/1773/1773345.png' width='27px' />} title="Campaign Revenue" info={'Sum Total Revenue through SuperLeadz Campaign'} data={!isLoading ? `₹${performanceData.campaign_revenue}` : <Spinner size={'25px'} />} />
                 </Col>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default'>
-                    <CardCom icon={<Check width={'20px'} />} title={<>Active Campaigns</>} data={!isLoading ? performanceData.active_campaign : <Spinner size={'25px'} />} info={`Number of SuperLeadz campaigns i.e. pop-ups that are active on the website`} />
+                <div className='col-md-6 cursor-default'>
+                    <CardCom icon={<Check width={'27px'}/>} title={<>Remaining <br /> Pop-up views</>} data={!chargesLoader ? Number(billing?.usage_charge) - Number(billing?.usage_count)  : <Spinner size={'25px'} />} info={`Total number of pop-ups (according to the plan) - number of pop-ups loaded on the website`} />
+                </div>
+                
+                <div className='col-md-6 cursor-default'>
+                    <CardCom icon={<Check width={'27px'}/>} title={<>Active Campaigns</>} data={!isLoading ? performanceData.active_campaign : <Spinner size={'25px'} />} info={`Number of SuperLeadz campaigns i.e. pop-ups that are active on the website`} />
                 </div>
 
 
@@ -680,51 +680,50 @@ function SuperLeadzDashboard() {
                     </Card>
                 </Col>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default d-none'>
-                    <CardCom icon={<Check width={'25px'} />} title={<>Impressions</>} data={!isLoading ? performanceData.impressions : <Spinner size={'25px'} />} info={`Number of times the pop-up is shown`} />
+                <div className='col-md-6 cursor-default d-none'>
+                    <CardCom icon={<Check width={'27px'} />} title={<>Impressions</>} data={!isLoading ? performanceData.impressions : <Spinner size={'25px'} />} info={`Number of times the pop-up is shown`} />
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default d-none'>
-                    <CardCom icon={<Check width={'25px'} />} title={<>Engaged</>} data={!isLoading ? performanceData.engaged : <Spinner size={'25px'} />} info={`Number of clicks on any button; inside the pop-up`} />
+                <div className='col-md-6 cursor-default d-none'>
+                    <CardCom icon={<Check width={'27px'} />} title={<>Engaged</>} data={!isLoading ? performanceData.engaged : <Spinner size={'25px'} />} info={`Number of clicks on any button; inside the pop-up`} />
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-pointer'>
-                    <CardCom icon={<UserPlus width={'25px'} />} title="Leads Generated" data={!isLoading ? performanceData?.leadsGenerated : <Spinner size={'25px'} />} info={`Total entries registered; including duplicates, verified or unverified`} />
-
-                </div>
-
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-pointer d-none'>
-                    <CardCom icon={<UserPlus width={'25px'} />} title="Unique leads Generated" data={!isLoading ? performanceData?.uniqueLeadsGenerated : <Spinner size={'25px'} />} info={`Total entries registered excluding duplicate entries`} />
+                <div className='col-md-6 cursor-pointer'>
+                    <CardCom icon={<UserPlus width={'27px'} />} title="Leads Generated" data={!isLoading ? performanceData?.leadsGenerated : <Spinner size={'25px'} />} info={`Total entries registered; including duplicates, verified or unverified`} />
 
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-pointer d-none'>
-                    <CardCom icon={<UserCheck width={'25px'} />} title="Verified Leads" data={!isLoading ? performanceData?.verifiedLeads : <Spinner size={'25px'} />} info={`Total entries registered who have verified via OTP`} />
+                <div className='col-md-6 cursor-pointer d-none'>
+                    <CardCom icon={<UserPlus width={'27px'} />} title="Unique leads Generated" data={!isLoading ? performanceData?.uniqueLeadsGenerated : <Spinner size={'25px'} />} info={`Total entries registered excluding duplicate entries`} />
 
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-pointer d-none'>
-                    <CardCom icon={<UserCheck width={'25px'} />} title="Unique Verified Leads" data={!isLoading ? performanceData?.uniqueVerifiedLeads : <Spinner size={'25px'} />} info={`Total entries registered who have verified via OTP excluding duplicates`} />
+                <div className='col-md-6 cursor-pointer d-none'>
+                    <CardCom icon={<UserCheck width={'27px'} />} title="Verified Leads" data={!isLoading ? performanceData?.verifiedLeads : <Spinner size={'25px'} />} info={`Total entries registered who have verified via OTP`} />
 
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-pointer'>
-                    <CardCom icon={<User width={'25px'} />} title="Visits" data={!isLoading ? performanceData?.vists : <Spinner size={'25px'} />} info={`Total visits on all pages`} />
+                <div className='col-md-6 cursor-pointer d-none'>
+                    <CardCom icon={<UserCheck width={'27px'} />} title="Unique Verified Leads" data={!isLoading ? performanceData?.uniqueVerifiedLeads : <Spinner size={'25px'} />} info={`Total entries registered who have verified via OTP excluding duplicates`} />
 
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default'>
-                    <CardCom icon={<Users width={'25px'} />} title={<>Visitor-to-Lead <br /> Conversion Rate</>} data={!isLoading ? `${performanceData?.vistsToLead}%` : <Spinner size={'25px'} />} info={`Number of Sessions to Leads`} />
+                <div className='col-md-6 cursor-pointer'>
+                    <CardCom icon={<User width={'27px'} />} title="Visits" data={!isLoading ? performanceData?.vists : <Spinner size={'25px'} />} info={`Total visits on all pages`}/>
+
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-pointer'>
-                    <CardCom icon={<SiConvertio size={'25px'} />} title="Leads Converted" data={!isLoading ? performanceData.leadConverted : <Spinner size={'25px'} />} info={`Unique Leads / Customers`} />
+                <div className='col-md-6 cursor-default'>
+                    <CardCom icon={<Users width={'27px'} />} title={<>Visitor-to-Lead <br /> Conversion Rate</>} data={!isLoading ? `${performanceData?.vistsToLead}%` : <Spinner size={'25px'} />} info={`Number of Sessions to Leads`} />
                 </div>
 
-                <div className='col-sm-12 col-md-4 col-xxl-4 col-xxxl-3 cursor-default'>
-                    <CardCom icon={<Percent width={'25px'} />} title={<>Lead-to-Customer <br /> Conversion Rate</>} data={!isLoading ? `${performanceData?.leadToCustomer}%` : <Spinner size={'25px'} />} info={`(Unique Leads / Customers) * 100`} />
+                <div className='col-md-6 cursor-pointer'>
+                    <CardCom icon={<SiConvertio size={'25px'} />} title="Leads Converted" data={!isLoading ? performanceData.leadConverted : <Spinner size={'25px'} />} info={`Unique Leads / Customers`}/>
                 </div>
-                <div className='d-flex justify-content-end' style={{ cursor: "pointer", textDecoration: "underline" }}><a>View All</a></div>
+
+                <div className='col-md-6 cursor-default'>
+                    <CardCom icon={<Percent width={'27px'} />} title={<>Lead-to-Customer <br /> Conversion Rate</>} data={!isLoading ? `${performanceData?.leadToCustomer}%` : <Spinner size={'25px'} />} info={`(Unique Leads / Customers) * 100`} />
+                </div>
 
             </Row>
 

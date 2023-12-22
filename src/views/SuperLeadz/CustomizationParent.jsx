@@ -1,6 +1,6 @@
 import React, { Suspense, useContext, useEffect, useState } from 'react'
 import { Crosshair, Edit, Image, Monitor, PlusCircle, Smartphone, Square, Tag, Target, Type, X, Trash2, XCircle, Columns, Disc, Trash, Percent, MoreVertical, ArrowLeft, Home, CheckSquare, Mail, RotateCcw, RotateCw, Check } from 'react-feather'
-import { AccordionBody, AccordionHeader, AccordionItem, Card, Container, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, Row, UncontrolledAccordion, UncontrolledDropdown, Col, ModalHeader, UncontrolledButtonDropdown } from 'reactstrap'
+import { AccordionBody, AccordionHeader, AccordionItem, Card, Container, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, Row, UncontrolledAccordion, UncontrolledDropdown, Col, ModalHeader, UncontrolledButtonDropdown, CardBody } from 'reactstrap'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import pixels from "../../assets/images/superLeadz/pixels.png"
 import PickerDefault from '../Components/Date-picker/NormalDatePicker'
@@ -16,7 +16,7 @@ import CustomColorModifier from '../FormBuilder/FormBuilder(components)/CustomCo
 import countries from '../NewFrontBase/Country'
 import isEqual from "lodash.isequal"
 // import UndoRedo from '../../data/hooks/UndoRedo'
-import { ThemesProvider } from '../../Helper/Context'
+import { PermissionProvider, ThemesProvider } from '../../Helper/Context'
 import { SuperLeadzBaseURL } from '../../assets/auth/jwtService'
 import Spinner from '../Components/DataTable/Spinner'
 import { generateRandomString, getCurrentOutlet, xircls_url } from '../Validator'
@@ -30,8 +30,40 @@ import slPrevBg from "../../assets/images/vector/slPrevBg.png"
 import FrontBaseLoader from '../Components/Loader/Loader'
 import RenderPreview from "./RenderPreview"
 import "./Customization.css"
+import { CheckBox, RadioInput, SelectInput } from './campaignView/components'
+
+
+export const fontStyles = [
+    { label: "Abril Fatface", value: `Abril Fatface` },
+    { label: "Acme", value: `Acme` },
+    { label: "Caveat", value: `Caveat` },
+    { label: "Dancing Script", value: `Dancing Script` },
+    { label: "Kalam", value: `Kalam` },
+    { label: "Lato", value: `Lato` },
+    { label: "Lexend", value: `Lexend` },
+    { label: "Lilita One", value: `Lilita One` },
+    { label: "Montserrat", value: `Montserrat` },
+    { label: "Noto Sans", value: `Noto Sans` },
+    { label: "Open Sans", value: `Open Sans` },
+    { label: "Oswald", value: `Oswald` },
+    { label: "Pacifico", value: `Pacifico` },
+    { label: "Play", value: `Play` },
+    { label: "Roboto", value: `Roboto` },
+    { label: "Satisfy", value: `Satisfy` },
+    { label: "sans-serif", value: `sans-serif` },
+    { label: "Ubuntu", value: `Ubuntu` }
+]
+
+const inputTypeList = [
+    { value: 'email', label: 'Email' },
+    { value: 'number', label: 'Phone Number' },
+    { value: 'firstName', label: 'First Name' },
+    { value: 'lastName', label: 'Last Name' },
+    { value: "enter_otp", label: "Enter OTP" }
+]
 
 const CustomizationParent = () => {
+    const { userPermission } = useContext(PermissionProvider)
 
     const themeLoc = useLocation()
     const { EditThemeId } = useParams()
@@ -39,14 +71,6 @@ const CustomizationParent = () => {
     const defaultIsMobile = new URLSearchParams(themeLoc.search)
 
     // const dateFormat = "%Y-%m-%d %H:%M:%S"
-
-    const fontStyles = [
-        { label: "Montserrat", value: `Montserrat` },
-        { label: "Open Sans", value: `Open Sans` },
-        { label: "Oswald", value: `Oswald` },
-        { label: "Abril Fatface", value: `Abril Fatface` },
-        { label: "Lato", value: `Lato` }
-    ]
 
     // const status = false
     const status = (defaultIsMobile.get('isMobile') !== "false" && defaultIsMobile.get('isMobile') !== undefined && defaultIsMobile.get('isMobile') !== null && defaultIsMobile.get('isMobile') !== false)
@@ -59,7 +83,6 @@ const CustomizationParent = () => {
 
     const mobileCondition = isMobile ? "mobile_" : ""
     const mobileConditionRev = !isMobile ? "mobile_" : ""
-
 
     const { allThemes, selectedThemeId } = useContext(ThemesProvider)
 
@@ -75,8 +98,9 @@ const CustomizationParent = () => {
 
     const [currColor, setCurrColor] = useState("primary")
     const [nameEdit, setNameEdit] = useState(true)
-
-    const [currPage, setCurrPage] = useState(finalObj?.[`${mobileCondition}pages`][0].id)
+    console.log(finalObj, "finalObj")
+    const [currPage, setCurrPage] = useState(finalObj?.[`${mobileCondition}pages`][0]?.id)
+    const [draggedInputType, setDraggedInputType] = useState("none")
 
     const pageCondition = currPage === "button" ? "button" : "main"
 
@@ -144,6 +168,9 @@ const CustomizationParent = () => {
 
     const [imgModal, setImgModal] = useState(false)
 
+    const [isOfferDraggable, setIsOfferDraggable] = useState(true)
+    const [phoneIsOfferDraggable, setPhoneIsOfferDraggable] = useState(true)
+
     const [cancelCust, setCancelCust] = useState(false)
 
     // const [offerColors, setOfferColors] = useState({ ...finalObj?.offerProperties?.colors })
@@ -160,10 +187,39 @@ const CustomizationParent = () => {
     const [offersModal, setOffersModal] = useState(false)
     const [emailPreviewModal, setEmailPreviewModal] = useState(false)
     const [apiLoader, setApiLoader] = useState(false)
+    const [selectedOffer, setSelectedOffer] = useState({})
+    const [renamePage, setRenamePage] = useState("")
+    const [pageName, setPageName] = useState("")
+
+    const refreshOfferDraggable = () => {
+        const arr = []
+        const phoneArr = []
+        finalObj?.pages?.forEach(page => {
+            page?.values?.forEach(cur => {
+                cur?.elements?.forEach(curElem => {
+                    curElem?.element?.forEach(subElem => {
+                        arr?.push(subElem?.type === "offer")
+                    })
+                })
+            })
+        })
+        finalObj?.mobile_pages?.forEach(page => {
+            page?.values?.forEach(cur => {
+                cur?.elements?.forEach(curElem => {
+                    curElem?.element?.forEach(subElem => {
+                        phoneArr?.push(subElem?.type === "offer")
+                    })
+                })
+            })
+        })
+        setIsOfferDraggable(!arr.includes(true))
+        setPhoneIsOfferDraggable(!phoneArr.includes(true))
+    }
 
     const updatePresent = (newState) => {
         const data = JSON.stringify(finalObj)
         const newObj = { ...newState }
+        // console.log(newState?.responsive, "responsice")
         if (Array.isArray(newState?.responsive)) {
             newState?.responsive?.forEach((responsive) => {
                 if (Array.isArray(responsive?.position)) {
@@ -171,36 +227,42 @@ const CustomizationParent = () => {
                         if (Array.isArray(position?.style)) {
                             position?.style?.forEach((style) => {
                                 if (style?.isSame) {
-                                    const arr1 = currPage === "button" ? newObj[`${mobileConditionRev}button`] : newObj[`${mobileConditionRev}pages`][newObj[`${mobileConditionRev}pages`]?.findIndex($ => $?.id === currPage)]?.values
-                                    const arr2 = currPage === "button" ? newObj[`${mobileCondition}button`] : newObj[`${mobileCondition}pages`][newObj[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)]?.values
-                                    const positionIndex = arr1[position?.id?.cur]?.elements?.findIndex($ => $?.positionType === position?.id?.curElem)
-                                    if (position?.id?.subElem === "grandparent") {
-                                        arr1[position?.id?.cur].style[style?.styleName] = arr2[position?.id?.cur].style[style?.styleName]
-                                        if (style?.styleName === "bgType") {
-                                            arr1[position?.id?.cur].style["backgroundColor"] = arr2[position?.id?.cur].style["backgroundColor"]
-                                            arr1[position?.id?.cur].style["backgroundImage"] = arr2[position?.id?.cur].style["backgroundImage"]
-                                        }
-                                    } else if (position?.id?.subElem === "parent") {
-                                        arr1[position?.id?.cur].elements[positionIndex].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex].style[style?.styleName]
-                                        if (style?.styleName === "bgType") {
-                                            arr1[position?.id?.cur].elements[positionIndex].style["backgroundColor"] = arr2[position?.id?.cur].elements[positionIndex].style["backgroundColor"]
-                                            arr1[position?.id?.cur].elements[positionIndex].style["backgroundImage"] = arr2[position?.id?.cur].elements[positionIndex].style["backgroundImage"]
-                                        }
-                                    } else {
-                                        arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style[style?.styleName]
-                                        if (style?.styleName === "bgType") {
-                                            arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style["backgroundColor"] = arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style["backgroundColor"]
-                                            arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style["backgroundImage"] = arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style["backgroundImage"]
-                                        }
-                                    }
+                                    const arr1 = currPage === "button" ? newObj[`${mobileConditionRev}button`] : newObj[`${mobileConditionRev}pages`][newObj[`${mobileConditionRev}pages`]?.findIndex($ => $?.id === currPage)]?.values || []
+                                    const arr2 = currPage === "button" ? newObj[`${mobileCondition}button`] : newObj[`${mobileCondition}pages`][newObj[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)]?.values || []
 
-                                    if (currPage === "button") {
-                                        newObj[`${mobileConditionRev}button`] = arr1
-                                        newObj[`${mobileCondition}button`] = arr2
-                                    } else {
-                                        const pageIndex = newObj[`${mobileConditionRev}pages`]?.findIndex($ => $.id === currPage)
-                                        newObj[`${mobileConditionRev}pages`][pageIndex].values = arr1
-                                        newObj[`${mobileCondition}pages`][pageIndex].values = arr2
+                                    if (arr1.length > 0 && arr2.length > 0) {
+                                        const positionIndex = arr1[position?.id?.cur]?.elements?.findIndex($ => $?.positionType === position?.id?.curElem)
+                                        const updateCustom = (list, obj1, obj2) => {
+                                            list.forEach(listName => {
+                                                obj1[listName] = obj2[listName]
+                                            })
+                                        }
+                                        if (position?.id?.subElem === "grandparent") {
+                                            arr1[position?.id?.cur].style[style?.styleName] = arr2[position?.id?.cur].style[style?.styleName]
+                                            if (style?.styleName === "bgType") {
+                                                updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur]?.style, arr2[position?.id?.cur]?.style)
+                                            }
+                                        } else if (position?.id?.subElem === "parent") {
+                                            arr1[position?.id?.cur].elements[positionIndex].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex].style[style?.styleName]
+                                            if (style?.styleName === "bgType") {
+                                                updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur].elements[positionIndex]?.style, arr2[position?.id?.cur].elements[positionIndex]?.style)
+                                            }
+                                        } else {
+                                            arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style[style?.styleName]
+                                            if (style?.styleName === "bgType") {
+                                                updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style, arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style)
+                                            }
+                                        }
+
+                                        if (currPage === "button") {
+                                            newObj[`${mobileConditionRev}button`] = arr1
+                                            newObj[`${mobileCondition}button`] = arr2
+                                        } else {
+                                            const pageIndex = newObj[`${mobileConditionRev}pages`]?.findIndex($ => $.id === currPage)
+                                            newObj[`${mobileConditionRev}pages`][pageIndex].values = arr1
+                                            newObj[`${mobileCondition}pages`][pageIndex].values = arr2
+                                        }
+
                                     }
                                 }
                             })
@@ -221,12 +283,13 @@ const CustomizationParent = () => {
             }
         }, delay)
 
+        refreshOfferDraggable()
+
         return () => {
             clearTimeout(request)
         }
-        
+
     }
-    // console.log(past, finalObj, "UNDOREDO")
     const setcolWise = (arr) => {
         if (currPage === "button") {
             updatePresent({ ...finalObj, [`${mobileCondition}button`]: [...arr] })
@@ -237,6 +300,7 @@ const CustomizationParent = () => {
             updatePresent({ ...newObj })
         }
     }
+
     const addPage = (e) => {
 
         const newObj = { ...finalObj }
@@ -315,9 +379,9 @@ const CustomizationParent = () => {
         }
     }
 
-    const handleDragStart = (e, dataType, keyType) => {
+    const handleDragStart = (e, dataType, inputType) => {
         e.dataTransfer.setData("type", dataType)
-        e.dataTransfer.setData("key", keyType)
+        setDraggedInputType(inputType ? inputType : "none")
     }
 
     const handleDragOver = (e) => {
@@ -331,7 +395,6 @@ const CustomizationParent = () => {
         // setSideNav('add-elements')
         const dataTransfered = e.dataTransfer.getData("type")
         const transferedData = dataTransfered?.includes("rearrange") ? dataTransfered?.split("rearrange_") : dataTransfered
-        // const transferedKey = e.dataTransfer.getData("key")
         const newObj = { ...finalObj }
 
         let updatedColWise = []
@@ -458,6 +521,7 @@ const CustomizationParent = () => {
                     }
                 ]
             } else if (transferedData !== "" && !transferedData?.includes("col")) {
+                const inputTypeCondition = draggedInputType === "none" ? commonObj?.inputType : draggedInputType
                 updatedColWise = [
                     ...finalObj?.pages[pageIndex]?.values, {
                         id: finalObj?.pages[pageIndex]?.values?.length + 1,
@@ -467,7 +531,7 @@ const CustomizationParent = () => {
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [dataTransfered?.includes("rearrange") ? { ...finalObj?.pages[pageIndex]?.values[dragStartIndex?.cur]?.elements[finalObj?.pages[pageIndex]?.values[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, id: finalObj?.pages[pageIndex]?.values?.length, style: elementStyles?.[transferedData] }]
+                                element: [dataTransfered?.includes("rearrange") ? { ...finalObj?.pages[pageIndex]?.values[dragStartIndex?.cur]?.elements[finalObj?.pages[pageIndex]?.values[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, id: finalObj?.pages[pageIndex]?.values?.length, style: elementStyles?.[transferedData] }]
                             }
                         ]
                     }
@@ -481,7 +545,7 @@ const CustomizationParent = () => {
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [dataTransfered?.includes("rearrange") ? { ...finalObj?.mobile_pages[mobile_pageIndex]?.values[dragStartIndex?.cur]?.elements[finalObj?.mobile_pages[mobile_pageIndex]?.values[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, id: finalObj?.pages[pageIndex]?.values?.length, style: elementStyles?.[transferedData] }]
+                                element: [dataTransfered?.includes("rearrange") ? { ...finalObj?.mobile_pages[mobile_pageIndex]?.values[dragStartIndex?.cur]?.elements[finalObj?.mobile_pages[mobile_pageIndex]?.values[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, id: finalObj?.pages[pageIndex]?.values?.length, style: elementStyles?.[transferedData] }]
                             }
                         ]
                     }
@@ -504,6 +568,8 @@ const CustomizationParent = () => {
         setValues({ ...elementStyles?.[dataTransfered] })
         const transferedData = dataTransfered?.includes("rearrange") ? dataTransfered?.split("rearrange_") : dataTransfered
 
+        const inputTypeCondition = draggedInputType === "none" ? commonObj?.inputType : draggedInputType
+
         if (transferedData !== "row") {
             const newObj = { ...finalObj }
             const pageIndex = newObj?.pages?.findIndex($ => $.id === currPage)
@@ -513,7 +579,7 @@ const CustomizationParent = () => {
                     const updatedElements = col?.elements?.map((ele) => {
                         if (ele?.positionType === position) {
                             const dupArray = [...ele?.element]
-                            dupArray[j] = dataTransfered?.includes("rearrange") ? { ...colWise[dragStartIndex?.cur]?.elements[colWise[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex?.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, ...ele?.elements, type: transferedData, style: elementStyles?.[transferedData] }
+                            dupArray[j] = dataTransfered?.includes("rearrange") ? { ...colWise[dragStartIndex?.cur]?.elements[colWise[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex?.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, ...ele?.elements, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles?.[transferedData] }
                             return {
                                 ...ele,
                                 element: [...dupArray]
@@ -534,7 +600,7 @@ const CustomizationParent = () => {
                     const updatedElements = col?.elements?.map((ele) => {
                         if (ele?.positionType === position) {
                             const dupArray = [...ele?.element]
-                            dupArray[j] = dataTransfered?.includes("rearrange") ? { ...colWise[dragStartIndex?.cur]?.elements[colWise[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex?.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, ...ele?.elements, type: transferedData, style: elementStyles?.[transferedData] }
+                            dupArray[j] = dataTransfered?.includes("rearrange") ? { ...colWise[dragStartIndex?.cur]?.elements[colWise[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex?.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, ...ele?.elements, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles?.[transferedData] }
                             return {
                                 ...ele,
                                 element: [...dupArray]
@@ -714,15 +780,7 @@ const CustomizationParent = () => {
     const renderElems = () => {
         const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
         const { selectedType } = currPosition
-        let styles, general, advanced
-
-        const inputTypeList = [
-            { value: 'email', label: 'Email' },
-            { value: 'number', label: 'Phone Number' },
-            { value: 'firstName', label: 'First Name' },
-            { value: 'lastName', label: 'Last Name' },
-            { value: "enter_otp", label: "Enter OTP" }
-        ]
+        let styles, general, spacing
 
         const draggedTypes = new Array()
 
@@ -780,7 +838,7 @@ const CustomizationParent = () => {
                                     {values.widthType === "custom" && <div className='mb-2 pb-1 border-bottom'>
                                         {getMDToggle({ label: `Width: ${arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style?.width || ""}`, value: "width" })}
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                            <input type='range' className='w-100' onChange={e => {
+                                            <input value={parseFloat(values?.width)} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, width: `${e.target.value}px` })
                                             }} name="height" min="20" max="600" />
                                         </div>
@@ -790,7 +848,7 @@ const CustomizationParent = () => {
                                         {getMDToggle({ label: `Height: ${arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style?.minHeight || ""}`, value: "minHeight" })}
                                         <p className='fw-bolder text-black mb-1' style={{ fontSize: "0.75rem" }}>Height: {arr[indexes.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style?.minHeight || ""}</p>
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                            <input type='range' className='w-100' onChange={e => {
+                                            <input value={parseFloat(values?.minHeight)} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, minHeight: `${e.target.value}px` })
                                             }} name="height" min="0" max="600" />
                                         </div>
@@ -950,7 +1008,7 @@ const CustomizationParent = () => {
                     </div>
                 </>
             )
-            advanced = (
+            spacing = (
                 <>
                     <UncontrolledAccordion defaultOpen={['1', '2', '3']} stayOpen>
                         <AccordionItem>
@@ -1032,7 +1090,7 @@ const CustomizationParent = () => {
                     </UncontrolledAccordion>
                 </>
             )
-            advanced = (
+            spacing = (
                 <>
                     <UncontrolledAccordion defaultOpen={['1', '2', '3']} stayOpen>
                         <AccordionItem>
@@ -1145,7 +1203,7 @@ const CustomizationParent = () => {
                     </UncontrolledAccordion>
                 </>
             )
-            advanced = (
+            spacing = (
                 <>
                     <UncontrolledAccordion defaultOpen={['1', '2', '3']} stayOpen>
                         <AccordionItem>
@@ -1191,7 +1249,7 @@ const CustomizationParent = () => {
                                 <BorderChange getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
                             </AccordionBody>
                         </AccordionItem>
-                        <AccordionItem>
+                        {/* <AccordionItem>
                             <AccordionHeader className='acc-header' targetId='3' style={{ borderBottom: '1px solid #EBE9F1', borderRadius: '0' }}>
                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Size</p>
                             </AccordionHeader>
@@ -1203,7 +1261,7 @@ const CustomizationParent = () => {
                                     </div>
                                 </div>
                             </AccordionBody>
-                        </AccordionItem>
+                        </AccordionItem> */}
 
                     </UncontrolledAccordion>
                 </>
@@ -1379,7 +1437,7 @@ const CustomizationParent = () => {
                     </div>
                 </div>
             )
-            advanced = (
+            spacing = (
                 <>
                     <UncontrolledAccordion defaultOpen={['1', '2', '3']} stayOpen>
                         <AccordionItem>
@@ -1448,21 +1506,20 @@ const CustomizationParent = () => {
                                     </div>
                                     {values?.widthType === "custom" && <div className='mb-2'>
                                         {getMDToggle({ label: `Width: ${values?.width}`, value: `width` })}
-                                        <p className='fw-bolder text-black mb-1' style={{ fontSize: "0.75rem" }}>Width: {values?.width}</p>
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
                                             <input value={parseFloat(values?.width)} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, width: `${e.target.value}px` })
                                             }} name="height" min="20" max="600" />
                                         </div>
                                     </div>}
-                                    <div className='mb-2'>
-                                        {getMDToggle({ label: `Width: ${values?.minHeight}`, value: `minHeight` })}
+                                    {values?.widthType === "custom" && <div className='mb-2'>
+                                        {getMDToggle({ label: `Height: ${values?.minHeight}`, value: `minHeight` })}
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
                                             <input value={parseFloat(values?.minHeight)} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, minHeight: `${e.target.value}px` })
                                             }} name="height" min="0" max="600" />
                                         </div>
-                                    </div>
+                                    </div>}
 
                                     {values.widthType !== "100%" && (<>
                                         {getMDToggle({ label: `Alignment:`, value: `alignType` })}
@@ -1517,6 +1574,14 @@ const CustomizationParent = () => {
                                             </div>
                                         </div>
                                     </>)}
+                                    {colWise[indexes?.cur].elements[positionIndex]?.element[indexes?.subElem]?.hasLabel && <div className='mb-2'>
+                                        {getMDToggle({ label: `Label and Input gap: ${values?.elemGap ? values?.elemGap : "0px"}`, value: `width` })}
+                                        <div className="d-flex p-0 justify-content-between align-items-center gap-2">
+                                            <input value={parseFloat(values?.elemGap ? values?.elemGap : "0px")} type='range' className='w-100' onChange={e => {
+                                                setValues({ ...values, elemGap: `${e.target.value}px` })
+                                            }} name="height" min="0" max="600" />
+                                        </div>
+                                    </div>}
                                 </div>
                             </AccordionBody>
                         </AccordionItem>
@@ -1579,15 +1644,6 @@ const CustomizationParent = () => {
                                 }} type="checkbox" name='title' min="0" max="300" className='form-check-input' />
                             </div>
                         </div>
-                        {colWise[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.hasLabel && <div className='my-2'>
-                            <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Label Text:</span>
-                            <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                <input value={colWise[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.labelText} onChange={e => {
-                                    arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].labelText = e.target.value
-                                    setcolWise([...arr])
-                                }} type="text" name='title' min="0" max="300" className='form-control' />
-                            </div>
-                        </div>}
                         <div className='d-flex p-0 my-1 justify-content-between gap-3 align-items-center'>
                             <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Required?</span>
                             <div className="form-check m-0 p-0">
@@ -1600,7 +1656,7 @@ const CustomizationParent = () => {
                         {colWise[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.isRequired && <div className='my-1'>
                             <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Error message:</span>
                             <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                <input type="text" name='title' min="0" max="300" className='form-control' />
+                                <input defaultValue={"Please fill this field"} type="text" name='title' min="0" max="300" className='form-control' />
                             </div>
                         </div>}
 
@@ -1610,7 +1666,7 @@ const CustomizationParent = () => {
                     </div>
                 </>
             )
-            advanced = (
+            spacing = (
                 <>
                     <UncontrolledAccordion defaultOpen={['1', '2', '3']} stayOpen>
                         <AccordionItem>
@@ -1713,7 +1769,7 @@ const CustomizationParent = () => {
                     </div>
                 </div>
             )
-            advanced = (
+            spacing = (
                 <>
                     <div className='mx-0 my-1 px-1'>
                         <div className=''>
@@ -1790,7 +1846,7 @@ const CustomizationParent = () => {
                     </UncontrolledAccordion>
                 </>
             )
-            advanced = (
+            spacing = (
                 <>
                     <UncontrolledAccordion defaultOpen={['1', '2', '3']} stayOpen>
                         <AccordionItem>
@@ -1829,6 +1885,66 @@ const CustomizationParent = () => {
                                 <div className='p-0 mx-0 my-1'>
                                     <button className="btn btn-primary w-100" onClick={() => setOffersModal(!offersModal)}>Change offer design</button>
                                 </div>
+                                <div className='p-0 mx-0 my-1'>
+                                    <span>Offer Redeem URL:</span>
+                                    {!isEqual(selectedOffer, {}) ? (
+                                        <div>
+                                            <label htmlFor="redeemUrl" className="form-control-label">OfferCode: {selectedOffer?.Code}</label>
+                                            <input value={finalObj?.selectedOffers[finalObj?.selectedOffers?.findIndex($ => isEqual($, selectedOffer))]?.url} placeHolder="Redeem URL" onChange={(e) => {
+                                                const newObj = { ...finalObj }
+                                                const offerIndex = newObj?.selectedOffers?.findIndex($ => isEqual($, selectedOffer))
+                                                newObj.selectedOffers[offerIndex].url = e.target.value
+                                                updatePresent({ ...newObj })
+                                            }} className="form-control" id="redeemUrl" />
+                                        </div>
+                                    ) : (
+                                        <span style={{ fontSize: "10px" }}>Please click on a selected offer on the previe to edit its URL</span>
+                                    )}
+                                </div>
+                            </AccordionBody>
+                        </AccordionItem>
+                        <AccordionItem>
+                            <AccordionHeader className='acc-header' targetId='2' style={{ borderBottom: '1px solid #EBE9F1', borderRadius: '0' }}>
+                                <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Toggle Sections</p>
+                            </AccordionHeader>
+                            <AccordionBody accordionId='2'>
+                                <div className='p-0 mx-0 my-1'>
+                                    <div className="form-check form-check-success">
+                                        <div className="d-flex align-items-center gap-1 mb-1">
+                                            <input onChange={() => {
+                                                if (finalObj?.offerProperties?.showSections?.includes("usage")) {
+                                                    updatePresent({ ...finalObj, offerProperties: { ...finalObj?.offerProperties, showSections: [...finalObj?.offerProperties?.showSections]?.filter($ => $ !== "usage") } })
+                                                } else {
+                                                    updatePresent({ ...finalObj, offerProperties: { ...finalObj?.offerProperties, showSections: [...finalObj?.offerProperties?.showSections, "usage"] } })
+
+                                                }
+                                            }} checked={finalObj?.offerProperties?.showSections?.includes("usage")} id='visible-offer-usage' type="checkbox" className="form-check-input" />
+                                            <label htmlFor="visible-offer-usage" className="form-check-label">Usage</label>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-1 mb-1">
+                                            <input onChange={() => {
+                                                if (finalObj?.offerProperties?.showSections?.includes("validity")) {
+                                                    updatePresent({ ...finalObj, offerProperties: { ...finalObj?.offerProperties, showSections: [...finalObj?.offerProperties?.showSections]?.filter($ => $ !== "validity") } })
+                                                } else {
+                                                    updatePresent({ ...finalObj, offerProperties: { ...finalObj?.offerProperties, showSections: [...finalObj?.offerProperties?.showSections, "validity"] } })
+
+                                                }
+                                            }} checked={finalObj?.offerProperties?.showSections?.includes("validity")} id='visible-offer-validity' type="checkbox" className="form-check-input" />
+                                            <label htmlFor="visible-offer-validity" className="form-check-label">Validity</label>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-1 mb-1">
+                                            <input onChange={() => {
+                                                if (finalObj?.offerProperties?.showSections?.includes("description")) {
+                                                    updatePresent({ ...finalObj, offerProperties: { ...finalObj?.offerProperties, showSections: [...finalObj?.offerProperties?.showSections]?.filter($ => $ !== "description") } })
+                                                } else {
+                                                    updatePresent({ ...finalObj, offerProperties: { ...finalObj?.offerProperties, showSections: [...finalObj?.offerProperties?.showSections, "description"] } })
+
+                                                }
+                                            }} checked={finalObj?.offerProperties?.showSections?.includes("description")} id='visible-offer-description' type="checkbox" className="form-check-input" />
+                                            <label htmlFor="visible-offer-description" className="form-check-label">Description</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </AccordionBody>
                         </AccordionItem>
                     </UncontrolledAccordion>
@@ -1846,7 +1962,7 @@ const CustomizationParent = () => {
                                     <div className='mb-2'>
                                         {getMDToggle({ label: `Width: ${values?.width}:`, value: `width` })}
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                            <input type='range' className='w-100' onChange={e => {
+                                            <input value={parseFloat(values?.width)} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, width: `${e.target.value}px` })
                                             }} name="height" min="300" max="600" />
                                         </div>
@@ -1855,7 +1971,7 @@ const CustomizationParent = () => {
                                         {getMDToggle({ label: `Max Height: ${values?.maxHeight}`, value: `maxHeight` })}
                                         <p className='fw-bolder text-black mb-1' style={{ fontSize: "0.75rem" }}>Max Height: {values?.maxHeight}</p>
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                            <input type='range' className='w-100' onChange={e => {
+                                            <input value={parseFloat(values?.maxHeight)} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, maxHeight: `${e.target.value}px` })
                                             }} name="height" min="0" max="600" />
                                         </div>
@@ -1894,7 +2010,7 @@ const CustomizationParent = () => {
                     </UncontrolledAccordion>
                 </>
             )
-            advanced = (
+            spacing = (
                 <UncontrolledAccordion defaultOpen={["1"]}>
                     <AccordionItem>
                         <AccordionHeader className='acc-header' targetId='1' style={{ borderBottom: '1px solid #EBE9F1', borderRadius: '0' }}>
@@ -1970,9 +2086,8 @@ const CustomizationParent = () => {
                                 <div className='p-0 mx-0 my-1'>
                                     <div className='mb-2'>
                                         {getMDToggle({ label: `Width: ${values?.width}`, value: `width` })}
-                                        <p className='fw-bolder text-black mb-1' style={{ fontSize: "0.75rem" }}>Width: {values?.width}</p>
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                            <input type='range' className='w-100' onChange={e => {
+                                            <input value={parseFloat(values?.width)} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, width: `${e.target.value}px` })
                                             }} name="height" min="50" max="600" />
                                         </div>
@@ -2013,7 +2128,7 @@ const CustomizationParent = () => {
                 </>
             )
 
-            advanced = (
+            spacing = (
                 <UncontrolledAccordion defaultOpen={["1", "2"]}>
                     <AccordionItem>
                         <AccordionHeader className='acc-header' targetId='1' style={{ borderBottom: '1px solid #EBE9F1', borderRadius: '0' }}>
@@ -2027,6 +2142,181 @@ const CustomizationParent = () => {
                         </AccordionBody>
                     </AccordionItem>
                 </UncontrolledAccordion>
+            )
+        } else if (selectedType === "display_frequency") {
+            return (
+                <div className="py-1 px-2 mt-1">
+                    <h4 className='mb-2'>Display Frequency</h4>
+                    <div className="form-check mb-1">
+                        <input type="radio" name='display_frequency' id='no_limit' value={"no_limit"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="no_limit">Do not limit</label>
+                    </div>
+                    <div className="form-check mb-1">
+                        <input type="radio" name='display_frequency' id='only_once' value={"only_once"} className="form-check-input cursor-pointer" /><label htmlFor="only_once" className="cursor-pointer" style={{ fontSize: "13px" }}>Only once</label>
+                    </div>
+                    <div className="form-check mb-1">
+                        <input type="radio" name='display_frequency' id='once_session' value={"once_session"} className="form-check-input cursor-pointer" /><label htmlFor="once_session" className="cursor-pointer" style={{ fontSize: "13px" }}>Once per session</label>
+                    </div>
+                    <div className="form-check mb-1">
+                        <input type="radio" name='display_frequency' id='one_time_per' value={"one_time_per"} className="form-check-input cursor-pointer" /><label htmlFor="one_time_per" className="cursor-pointer" style={{ fontSize: "13px" }}>One time per</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-1">
+                            <div className="w-75">
+                                <Select options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} />
+                            </div>
+                            <div className="w-50">
+                                <Select options={[{ label: "Days", value: "Days" }, { label: "Months", value: "Months" }, { label: "Year", value: "Year" }]} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )
+        } else if (selectedType === "display_when") {
+            return (
+                <div className='py-1 px-2 mt-1'>
+                    <h4 className='mb-2'>When to display</h4>
+                    <div className="form-check mb-2">
+                        <input type="radio" name='display_when' id='immediately' value={"immediately"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="immediately">Immediately</label>
+                    </div>
+                    <div className="form-check mb-2">
+                        <input type="radio" name='display_when' id='all_condition_met' value={"all_condition_met"} className="form-check-input cursor-pointer" /><label htmlFor="all_condition_met" className="cursor-pointer" style={{ fontSize: "13px" }}>When All Conditions are met</label>
+                    </div>
+                    <div className="form-check mb-2">
+                        <input type="radio" name='display_when' id='any_condition_met' value={"any_condition_met"} className="form-check-input cursor-pointer" /><label htmlFor="any_condition_met" className="cursor-pointer" style={{ fontSize: "13px" }}>When any Condition is met</label>
+                    </div>
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='spent_on_page' value={"spent_on_page"} className="form-check-input cursor-pointer" /><label htmlFor="spent_on_page" className="cursor-pointer" style={{ fontSize: "13px" }}>Spend on the Page</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-2">
+                            <div className="w-75">
+                                <Select options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} />
+                            </div>
+                            <div className="w-50">
+                                <Select options={[{ label: "Days", value: "Days" }, { label: "Months", value: "Months" }, { label: "Year", value: "Year" }]} />
+                            </div>
+                        </div>
+                    )}
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='spent_on_website' value={"spent_on_website"} className="form-check-input cursor-pointer" /><label htmlFor="spent_on_website" className="cursor-pointer" style={{ fontSize: "13px" }}>Spend on the Website</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-2">
+                            <div className="w-75">
+                                <Select options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} />
+                            </div>
+                            <div className="w-50">
+                                <Select options={[{ label: "Days", value: "Days" }, { label: "Months", value: "Months" }, { label: "Year", value: "Year" }]} />
+                            </div>
+                        </div>
+                    )}
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='read_page_by' value={"read_page_by"} className="form-check-input cursor-pointer" /><label htmlFor="read_page_by" className="cursor-pointer" style={{ fontSize: "13px" }}>Read the page by</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-2">
+                            <Select options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} />%
+                        </div>
+                    )}
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='visited' value={"visited"} className="form-check-input cursor-pointer" /><label htmlFor="visited" className="cursor-pointer" style={{ fontSize: "13px" }}>Visited</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-2">
+                            <Select options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} /> Pages
+                        </div>
+                    )}
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='not_active_page' value={"not_active_page"} className="form-check-input cursor-pointer" /><label htmlFor="not_active_page" className="cursor-pointer" style={{ fontSize: "13px" }}>Not active on the page</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-2">
+                            <div className="w-75">
+                                <Select options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} />
+                            </div>
+                            <div className="w-50">
+                                <Select options={[{ label: "Days", value: "Days" }, { label: "Months", value: "Months" }, { label: "Year", value: "Year" }]} />
+                            </div>
+                        </div>
+                    )}
+                    <div className="form-check form-switch mb-2">
+                        <input type="checkbox" role='switch' id='exit_intent' value={"exit_intent"} className="form-check-input cursor-pointer" /><label htmlFor="exit_intent" className="cursor-pointer" style={{ fontSize: "13px" }}>Exit intent</label>
+                    </div>
+                </div>
+            )
+        } else if (selectedType === "stop_display_when") {
+            return (
+                <div className='py-1 px-2 mt-1'>
+                    <h4 className='mb-2'>When to Stop displaying</h4>
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='stop_display_pages' value={"stop_display_pages"} className="form-check-input cursor-pointer" /><label htmlFor="stop_display_pages" className="cursor-pointer" style={{ fontSize: "13px" }}>Pages</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-1">
+                            <Select className='w-75' options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} /> <p className='w-50' style={{ fontSize: "10px" }} >Seconds, in case of no interaction with the widget</p>
+                        </div>
+                    )}
+                    <p className='mb-2'>The condition canceled when a user hovers the widget</p>
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='stop_display_after' value={"stop_display_after"} className="form-check-input cursor-pointer" /><label htmlFor="stop_display_after" className="cursor-pointer" style={{ fontSize: "13px" }}>After</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-1">
+                            <Select className='w-75' options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} /> <p className='w-50' style={{ fontSize: "10px" }} >Seconds, in case of no interaction with the widget</p>
+                        </div>
+                    )}
+                    <p>The condition canceled when a user hovers the widget</p>
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='stop_display_after_closing' value={"stop_display_after_closing"} className="form-check-input cursor-pointer" /><label htmlFor="stop_display_after_closing" className="cursor-pointer" style={{ fontSize: "13px" }}>After closing</label>
+                    </div>
+                    {true && (  //condition here
+                        <div className="d-flex gap-1 mb-1">
+                            <Select className='w-75' options={[{ label: "1", value: "1" }, { label: "2", value: "2" }, { label: "3", value: "3" }]} /> times
+                        </div>
+                    )}
+                    <div className="form-check form-switch mb-1">
+                        <input type="checkbox" role='switch' id='stop_display_after_subscription' value={"stop_display_after_subscription"} className="form-check-input cursor-pointer" /><label htmlFor="stop_display_after_subscription" className="cursor-pointer" style={{ fontSize: "13px" }}>After subscription</label>
+                    </div>
+                    <div className="form-check mb-2">
+                        <input type="radio" name='stop_display' id='any_widget' value={"any_widget"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="any_widget">From any widget</label>
+                    </div>
+                    <div className="form-check mb-2">
+                        <input type="radio" name='stop_display' id='this_widget' value={"this_widget"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="this_widget">From this widget</label>
+                    </div>
+                </div>
+            )
+        } else if (selectedType === "on_pages") {
+            return (
+                <div className='d-flex gap-1 mb-2 p-1'>
+                    <div>
+                        {/* <Activity /> */}
+                    </div>
+                    <div >
+                        <h4 className='mb-1'>Annoyance Safeguard</h4>
+                        <div>
+                            <p>What to do with this widget if:</p>
+                        </div>
+                        <div className='ms-2'>
+                            <p>-Another widget has to be displayed together with this one</p>
+                            <p>-Another widget is displayed on the screen</p>
+                            <p>-Another widget has been displayed recently</p>
+                        </div>
+                        <div className='mb-1'>
+                            <Link to='/' style={{ textDecoration: "underline" }}>How it works</Link>
+                        </div>
+                        <div>
+                            <div className="form-check mb-2">
+                                <input type="radio" name='safeguard' id='on_pages_show' value={"on_pages_show"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="on_pages_show">Show</label>
+                            </div>
+                            <div className="form-check mb-2">
+                                <input type="radio" name='safeguard' id='on_pages_show_interval' value={"on_pages_show_interval"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="on_pages_show_interval">Show in sequence using Slient Interval</label>
+                            </div>
+                            <div className="form-check mb-2">
+                                <input type="radio" name='safeguard' id='on_pages_dont_show' value={"on_pages_dont_show"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="on_pages_dont_show">Don't show during the current session</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )
         } else {
             function getSideText(subElem) {
@@ -2236,13 +2526,14 @@ const CustomizationParent = () => {
                 </div>
             )
         }
-        return <ModificationSection key={`${currPage}-${currPosition.selectedType}-${indexes.cur}-${indexes.curElem}-${indexes.subElem}`} currPosition={currPosition} setCurrPosition={setCurrPosition} styles={styles} general={general} advanced={advanced} />
+        return <ModificationSection key={`${currPage}-${currPosition.selectedType}-${indexes.cur}-${indexes.curElem}-${indexes.subElem}`} currPosition={currPosition} setCurrPosition={setCurrPosition} styles={styles} general={general} spacing={spacing} />
     }
 
 
     const handleColDrop = (e, cur, curElem, subElem) => {
         e.stopPropagation()
         const transferedData = e.dataTransfer.getData("type")
+        const inputTypeCondition = draggedInputType === "none" ? commonObj?.inputType : draggedInputType
         const dragOverData = document.getElementById(`${currPage}-${dragOverIndex.cur}-${dragOverIndex.curElem}-${dragOverIndex.subElem}`)?.getBoundingClientRect()
         const y = dragOverData?.y
         const height = dragOverData?.height
@@ -2258,11 +2549,11 @@ const CustomizationParent = () => {
             }
 
             if (mousePos.y - (y + (height / 2)) < 0) {
-                dupArray[dragOverIndex.cur].elements[dupArray[dragOverIndex.cur].elements.findIndex($ => $?.positionType === dragOverIndex.curElem)].element.splice(dragOverIndex.subElem, 0, { ...commonObj, type: transferedData, style: elementStyles[transferedData] })
+                dupArray[dragOverIndex.cur].elements[dupArray[dragOverIndex.cur].elements.findIndex($ => $?.positionType === dragOverIndex.curElem)].element.splice(dragOverIndex.subElem, 0, { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles[transferedData] })
                 mobile_dupArray[dragOverIndex.cur].elements[mobile_dupArray[dragOverIndex.cur].elements.findIndex($ => $?.positionType === dragOverIndex.curElem)].element.splice(dragOverIndex.subElem, 0, { ...commonObj, type: transferedData, style: elementStyles[transferedData] })
                 setIndexes({ ...dragOverIndex })
             } else {
-                dupArray[dragOverIndex.cur].elements[dupArray[dragOverIndex.cur].elements.findIndex($ => $?.positionType === dragOverIndex.curElem)].element.splice(dragOverIndex.subElem + 1, 0, { ...commonObj, type: transferedData, style: elementStyles[transferedData] })
+                dupArray[dragOverIndex.cur].elements[dupArray[dragOverIndex.cur].elements.findIndex($ => $?.positionType === dragOverIndex.curElem)].element.splice(dragOverIndex.subElem + 1, 0, { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles[transferedData] })
                 mobile_dupArray[dragOverIndex.cur].elements[mobile_dupArray[dragOverIndex.cur].elements.findIndex($ => $?.positionType === dragOverIndex.curElem)].element.splice(dragOverIndex.subElem + 1, 0, { ...commonObj, type: transferedData, style: elementStyles[transferedData] })
                 setIndexes({ cur, curElem, subElem })
             }
@@ -2370,9 +2661,8 @@ const CustomizationParent = () => {
         if (themeName === "") {
             toast.error("Enter a theme name")
             setApiLoader(false)
-        } else if (finalObj.selectedOffers.length === 0) {
+        } else if (isOfferDraggable && phoneIsOfferDraggable && finalObj.selectedOffers.length === 0) {
             toast.error("Add some offers to your Theme!")
-            setApiLoader(false)
         } else if (includesInput?.length > 0) {
             setApiLoader(false)
             toast.error(<span> You have not selected input type {includesInput.map((ip, i) => {
@@ -2471,12 +2761,12 @@ const CustomizationParent = () => {
             url,
             data: form_data
         })
-        .then((data) => {
-            setIsPro(data?.data?.data[0]?.plan_id?.toLowerCase()?.includes("pro"))
-        })
-        .catch((error) => {
-            console.log({ error })
-        })
+            .then((data) => {
+                setIsPro(data?.data?.data[0]?.plan_id?.toLowerCase()?.includes("pro"))
+            })
+            .catch((error) => {
+                console.log({ error })
+            })
     }
 
     useEffect(() => {
@@ -2521,6 +2811,7 @@ const CustomizationParent = () => {
         const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
         const onLoadMobile = status ? "mobile_" : ""
         getOffers()
+        refreshOfferDraggable()
         getPlan()
         const campaignStartDate = finalObj?.campaignStartDate === "" ? moment(new Date()).format("YYYY-MM-DD HH:mm:ss") : Array.isArray(finalObj?.campaignStartDate) ? moment(finalObj?.campaignStartDate[0]).format("YYYY-MM-DD HH:mm:ss") : finalObj?.campaignStartDate
         const campaignEndDate = !finalObj?.campaignHasEndDate ? "" : finalObj?.campaignEndDate === "" ? moment(new Date()).format("YYYY-MM-DD HH:mm:ss") : Array.isArray(finalObj?.campaignEndDate) ? moment(finalObj?.campaignEndDate[0]).format("YYYY-MM-DD HH:mm:ss") : finalObj?.campaignEndDate
@@ -2561,16 +2852,20 @@ const CustomizationParent = () => {
         const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
         const newObj = { ...finalObj }
         const newBgStyles = { ...finalObj?.backgroundStyles?.[`${mobileCondition}main`] }
+        const newBgStyles2 = { ...finalObj?.backgroundStyles?.[`${mobileCondition}button`] }
         function changeStyles(obj) {
             if (obj?.isInitialBgColor) {
                 obj.backgroundColor = defColors[obj?.initialBgColor]
-            } else if (obj?.isInitialColor) {
+            }
+            if (obj?.isInitialColor) {
                 obj.color = defColors[obj?.initialColor]
-            } else if (obj?.isInitialBorderColor) {
+            }
+            if (obj?.isInitialBorderColor) {
                 obj.borderColor = defColors[obj?.initialBorderColor]
             }
         }
         changeStyles(newBgStyles)
+        changeStyles(newBgStyles2)
         newObj?.pages?.forEach((page) => {
             page?.values?.forEach((cur) => {
                 changeStyles(cur?.style)
@@ -2593,8 +2888,28 @@ const CustomizationParent = () => {
                 })
             })
         })
-        updatePresent({ ...finalObj, backgroundStyles: { ...finalObj?.backgroundStyles, [`${mobileCondition}main`]: { ...newBgStyles } } })
-        setcolWise(currPage === "button" ? newObj?.button : newObj?.pages[newObj?.pages?.findIndex($ => $?.id === currPage)]?.values)
+
+        newObj?.button?.forEach((cur) => {
+            changeStyles(cur?.style)
+            cur?.elements?.forEach((curElem) => {
+                changeStyles(curElem?.style)
+                curElem?.element?.forEach((subElem) => {
+                    changeStyles(subElem?.style)
+                })
+            })
+        })
+
+        newObj?.mobile_button?.forEach((cur) => {
+            changeStyles(cur?.style)
+            cur?.elements?.forEach((curElem) => {
+                changeStyles(curElem?.style)
+                curElem?.element?.forEach((subElem) => {
+                    changeStyles(subElem?.style)
+                })
+            })
+        })
+        // updatePresent({ ...finalObj, backgroundStyles: { ...finalObj?.backgroundStyles, [`${mobileCondition}main`]: { ...newBgStyles } } })
+        // setcolWise(currPage === "button" ? newObj?.button : newObj?.pages[newObj?.pages?.findIndex($ => $?.id === currPage)]?.values)
         const positionIndex = colWise[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes?.curElem)
         if (indexes.subElem === "grandparent") {
             setValues(currPage === "button" ? { ...newObj?.button[indexes.cur]?.style } : { ...newObj?.pages[newObj?.pages?.findIndex($ => $?.id === currPage)]?.values[indexes.cur]?.style })
@@ -2603,7 +2918,7 @@ const CustomizationParent = () => {
         } else {
             setValues(currPage === "button" ? { ...newObj?.button[indexes.cur]?.elements[positionIndex]?.element[indexes.subElem]?.style } : { ...newObj?.pages[newObj?.pages?.findIndex($ => $?.id === currPage)]?.values[indexes.cur]?.elements[positionIndex]?.element[indexes.subElem]?.style })
         }
-        updatePresent({ ...newObj, defaultThemeColors: { ...finalObj.defaultThemeColors, [currColor]: defColors[currColor] } })
+        updatePresent({ ...newObj, defaultThemeColors: { ...finalObj.defaultThemeColors, [currColor]: defColors[currColor] }, backgroundStyles: { ...finalObj?.backgroundStyles, [`${mobileCondition}main`]: { ...newBgStyles } } })
     }, [defColors, currColor])
 
     useEffect(() => {
@@ -2634,6 +2949,21 @@ const CustomizationParent = () => {
         setPast(newPast)
         setFuture([finalObj, ...future])
         setFinalObj(newPresent)
+        const arr = currPage === "button" ? newPresent?.[`${mobileCondition}button`] : newPresent?.[`${mobileCondition}pages`][newPresent?.[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)].values
+        const positionIndex = arr[indexes?.cur]?.elements?.findIndex($ => $?.positionType === indexes?.curElem)
+        if (indexes.subElem === "grandparent") {
+            if (arr[indexes?.cur]?.style) {
+                setValues({ ...arr[indexes?.cur]?.style })
+            }
+        } else if (indexes.subElem === "parent") {
+            if (arr[indexes?.cur]?.elements[positionIndex]?.style) {
+                setValues({ ...arr[indexes.cur]?.elements[positionIndex]?.style })
+            }
+        } else {
+            if (arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style) {
+                setValues({ ...arr[indexes.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style })
+            }
+        }
     }
 
     const redo = () => {
@@ -2645,6 +2975,21 @@ const CustomizationParent = () => {
         setPast([...past, finalObj])
         setFuture(newFuture)
         setFinalObj(newPresent)
+        const arr = currPage === "button" ? newPresent?.[`${mobileCondition}button`] : newPresent?.[`${mobileCondition}pages`][newPresent?.[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)].values
+        const positionIndex = arr[indexes?.cur]?.elements?.findIndex($ => $?.positionType === indexes?.curElem)
+        if (indexes.subElem === "grandparent") {
+            if (arr[indexes?.cur]?.style) {
+                setValues({ ...arr[indexes?.cur]?.style })
+            }
+        } else if (indexes.subElem === "parent") {
+            if (arr[indexes?.cur]?.elements[positionIndex]?.style) {
+                setValues({ ...arr[indexes.cur]?.elements[positionIndex]?.style })
+            }
+        } else {
+            if (arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style) {
+                setValues({ ...arr[indexes.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style })
+            }
+        }
     }
 
     const currPageIndex = finalObj?.pages?.findIndex($ => $?.id === currPage)
@@ -2688,8 +3033,8 @@ const CustomizationParent = () => {
                                 </a>
                             </div>
                             <div style={{ gap: "0.5rem" }} className="d-flex align-items-center">
-                                <button className="btn border" style={{ padding: "0.75rem" }} onClick={() => undo()}><RotateCcw size={15} /></button>
-                                <button className="btn border" style={{ padding: "0.75rem" }} onClick={() => redo()}><RotateCw size={15} /></button>
+                                <button title="Undo" className="btn border btn-dark" style={{ padding: "0.75rem" }} onClick={() => undo()}><RotateCcw size={15} /></button>
+                                <button title="Redo" className="btn border btn-dark" style={{ padding: "0.75rem" }} onClick={() => redo()}><RotateCw size={15} /></button>
                             </div>
                             <button className="btn custom-btn-outline" onClick={() => setCancelCust(!cancelCust)}>Cancel</button>
                             {/* <button onClick={() => undo()}>Undo</button>
@@ -2712,7 +3057,7 @@ const CustomizationParent = () => {
                     {/* Component for changing background of the selected element */}
 
                     {/* Sidebar */}
-                    <div className="nav-sidebar d-flex flex-column align-items-stretch justify-content-start border-end text-center h-100" style={{ padding: "0.5rem", width: "70px", overflow: "auto" }}>
+                    <div className="nav-sidebar d-flex flex-column align-items-stretch justify-content-start border-end text-center h-100" style={{ padding: "0.5rem", width: "70px", overflow: "auto", gap: '20px' }}>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "theme" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "theme" ? "" : "theme")}>
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <svg
@@ -2742,6 +3087,12 @@ const CustomizationParent = () => {
                             </button>
                             <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Display</span>
                         </div>
+                        <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "trigger" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "trigger" ? "" : "trigger")}>
+                            <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
+                                <Monitor size={15} />
+                            </button>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Triggers</span>
+                        </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${(sideNav === "add-elements" || sideNav === "button") ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => {
                             if (currPage === "button") {
                                 setSideNav(sideNav === "button" ? "" : "button")
@@ -2767,13 +3118,13 @@ const CustomizationParent = () => {
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Crosshair size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Duration</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Schedule</span>
                         </div>
-                        <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "email" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "email" ? "" : "email")}>
+                        <div className={`sideNav-items d-none flex-column align-items-center justify-content-center ${sideNav === "rules" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "rules" ? "" : "rules")}>
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Mail size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Email</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Rules</span>
                         </div>
                     </div>
                     {/* Sidebar */}
@@ -2781,20 +3132,19 @@ const CustomizationParent = () => {
                     {/* Preview and Edit Section */}
                     <div className="d-flex align-items-stretch flex-grow-1 h-100">
                         {/* Section Drawer */}
-                        <div className=" border-end bg-white position-relative h-100" style={{ width: sideNav === "" ? "0px" : "240px", overflowX: "hidden", transition: "0.3s ease-in-out", opacity: "1", boxShadow: "10px 2px 5px rgba(0,0,0,0.125)", zIndex: "1" }}>
+                        <div className=" border-end bg-white position-relative h-100" style={{ width: sideNav === "" || sideNav === "rules" ? "0px" : "240px", overflowX: "hidden", transition: "0.3s ease-in-out", opacity: "1", boxShadow: "10px 2px 5px rgba(0,0,0,0.125)", zIndex: "1" }}>
                             <div className='w-100' style={{ height: "100%", overflowY: "auto" }}>
 
                                 {/* Theme Section */}
                                 {sideNav === "theme" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "240px", transform: `translateX(${sideNav === "theme" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
-                                    <UncontrolledAccordion stayOpen defaultOpen={["1", "2"]}>
+                                    <UncontrolledAccordion stayOpen defaultOpen={["1"]}>
                                         <AccordionItem>
                                             <AccordionHeader className='acc-header border-top' targetId='1' style={{ borderBottom: '1px solid #EBE9F1', borderRadius: '0' }}>
                                                 <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Quick Setup</label>
                                             </AccordionHeader>
-
                                             <AccordionBody accordionId='1'>
                                                 <div className="py-1">
-                                                    <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Main Font</label>
+                                                    <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Primary Font</label>
                                                     <Select value={fontStyles[fontStyles?.findIndex($ => $?.value === finalObj?.fontFamilies?.primary)]} id='font-select-primary' styles={{
                                                         option: (provided, state) => {
                                                             return ({ ...provided, fontFamily: fontStyles[fontStyles?.findIndex($ => $?.value === state.value)]?.value })
@@ -2818,7 +3168,7 @@ const CustomizationParent = () => {
                                                     />
                                                 </div>
                                                 <div className="py-1">
-                                                    <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Main Colour</label>
+                                                    <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Primary Colour</label>
                                                     {/* <div className="d-flex align-items-center justify-content-between gap-1 form-check form-check-success p-0" style={{ marginBottom: '5px' }}>
                                                         <label style={{ fontSize: "10px" }} className="form-check-label m-0 p-0">Set default</label>
                                                         <input type='checkbox' className='form-check-input m-0 p-0' onChange={(e) => {
@@ -2839,28 +3189,24 @@ const CustomizationParent = () => {
                                                                 setCurrColor("secondary1")
                                                                 setCustomColorModal2(!customColorModal2)
                                                             }}></div>
-
                                                         </div>
                                                         <div className='cursor-pointer flex-grow-1' style={{ backgroundImage: `url(${pixels})` }}>
                                                             <div className="p-1 rounded border" style={{ backgroundColor: finalObj?.defaultThemeColors?.secondary2 }} onClick={() => {
                                                                 setCurrColor("secondary2")
                                                                 setCustomColorModal2(!customColorModal2)
                                                             }}></div>
-
                                                         </div>
                                                         <div className='cursor-pointer flex-grow-1' style={{ backgroundImage: `url(${pixels})` }}>
                                                             <div className="p-1 rounded border" style={{ backgroundColor: finalObj?.defaultThemeColors?.secondary3 }} onClick={() => {
                                                                 setCurrColor("secondary3")
                                                                 setCustomColorModal2(!customColorModal2)
                                                             }}></div>
-
                                                         </div>
                                                         <div className='cursor-pointer flex-grow-1' style={{ backgroundImage: `url(${pixels})` }}>
                                                             <div className="p-1 rounded border" style={{ backgroundColor: finalObj?.defaultThemeColors?.secondary4 }} onClick={() => {
                                                                 setCurrColor("secondary4")
                                                                 setCustomColorModal2(!customColorModal2)
                                                             }}></div>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2882,7 +3228,7 @@ const CustomizationParent = () => {
                                                                 currPage === "button" ? setBgModal3(!bgModal3) : setBgModal2(!bgModal2)
                                                             }} className="p-2 w-100" style={{ backgroundColor: currPage === "button" ? finalObj?.backgroundStyles[`${mobileCondition}button`]?.backgroundColor : finalObj?.backgroundStyles[`${mobileCondition}main`]?.backgroundColor, backgroundImage: currPage === "button" ? finalObj?.backgroundStyles[`${mobileCondition}button`]?.backgroundImage : finalObj?.backgroundStyles[`${mobileCondition}main`]?.backgroundImage }}></div>
                                                         </div>
-                                                        <div className="d-flex align-items-center justify-content-between gap-1 form-check form-check-success m-0 p-0">
+                                                        {/* <div className="d-flex align-items-center justify-content-between gap-1 form-check form-check-success m-0 p-0">
                                                             <label style={{ fontSize: "10px" }} className="form-check-label m-0 p-0">Keep same background for {isMobile ? "desktop theme" : "mobile theme"}</label>
                                                             <input
                                                                 // checked={bgCheckedCondition}
@@ -2902,7 +3248,7 @@ const CustomizationParent = () => {
                                                                     }
                                                                     updatePresent({ ...newObj })
                                                                 }} />
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Size</p>
@@ -2914,7 +3260,7 @@ const CustomizationParent = () => {
                                                                 value={parseFloat(currPage === "button" ? finalObj?.backgroundStyles[`${mobileCondition}button`][isMobile ? "maxWidth" : "width"] : finalObj?.backgroundStyles[`${mobileCondition}main`]?.[isMobile ? "maxWidth" : "width"])}
                                                                 className='w-100' onChange={e => {
                                                                     currPage === "button" ? updatePresent({ ...finalObj, backgroundStyles: { ...finalObj?.backgroundStyles, [`${mobileCondition}button`]: { ...finalObj?.backgroundStyles[`${mobileCondition}button`], [e.target.name]: `${e.target.value}${isMobile ? "%" : "px"}` } } }) : updatePresent({ ...finalObj, backgroundStyles: { ...finalObj?.backgroundStyles, [`${mobileCondition}main`]: { ...finalObj?.backgroundStyles[`${mobileCondition}main`], [e.target.name]: `${e.target.value}${isMobile ? "%" : "px"}` } } })
-                                                                }} name={isMobile ? "maxWidth" : "width"} min="25" max={isMobile ? "100" : "600"} />
+                                                                }} name={isMobile ? "maxWidth" : "width"} min="25" max={isMobile ? "100" : "800"} />
                                                         </div>
                                                     </div>
                                                     <div className=''>
@@ -2922,7 +3268,7 @@ const CustomizationParent = () => {
                                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
                                                             <input type='range' value={parseFloat(currPage === "button" ? finalObj?.backgroundStyles[`${mobileCondition}button`]?.minHeight : finalObj?.backgroundStyles[`${mobileCondition}main`]?.minHeight)} onChange={e => {
                                                                 currPage === "button" ? updatePresent({ ...finalObj, backgroundStyles: { ...finalObj?.backgroundStyles, [`${mobileCondition}button`]: { ...finalObj?.backgroundStyles[`${mobileCondition}button`], minHeight: `${e.target.value}px` } } }) : updatePresent({ ...finalObj, backgroundStyles: { ...finalObj.backgroundStyles, [`${mobileCondition}main`]: { ...finalObj?.backgroundStyles[`${mobileCondition}main`], minHeight: `${e.target.value}px` } } })
-                                                            }} className='w-100' name="height" min="50" max="650" />
+                                                            }} className='w-100' name="height" min="50" max="800" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2932,7 +3278,7 @@ const CustomizationParent = () => {
                                         </AccordionItem>
                                         <AccordionItem>
                                             <AccordionHeader className='acc-header' targetId='2' style={{ borderBottom: '1px solid #EBE9F1', borderRadius: '0' }}>
-                                                <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Advanced</label>
+                                                <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Spacing</label>
                                             </AccordionHeader>
                                             <AccordionBody accordionId='2'>
                                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Spacing</p>
@@ -2940,10 +3286,10 @@ const CustomizationParent = () => {
                                                     <InputChange
                                                         getMDToggle={getMDToggle} parentType={currPage === "button" ? "btnStyles" : "bgStyles"} setMainStyle={updatePresent} mainStyle={finalObj} mobileCondition={mobileCondition} allValues={currPage === "button" ? finalObj?.backgroundStyles?.[`${mobileCondition}button`] : finalObj?.backgroundStyles?.[`${mobileCondition}main`]} type='padding' />
                                                 </div>
-                                                {currPage !== "button" && <div className='p-0 mx-0 my-1'>
+                                                <div className='p-0 mx-0 my-1'>
                                                     <InputChange
                                                         getMDToggle={getMDToggle} parentType={currPage === "button" ? "btnStyles" : "bgStyles"} setMainStyle={updatePresent} mainStyle={finalObj} mobileCondition={mobileCondition} allValues={currPage === "button" ? finalObj?.backgroundStyles?.[`${mobileCondition}button`] : finalObj?.backgroundStyles?.[`${mobileCondition}main`]} type='margin' />
-                                                </div>}
+                                                </div>
                                             </AccordionBody>
                                         </AccordionItem>
                                     </UncontrolledAccordion>
@@ -2959,22 +3305,22 @@ const CustomizationParent = () => {
                                             </AccordionHeader>
                                             <AccordionBody accordionId='1'>
                                                 <div className='p-0 mx-0 my-1'>
-                                                    <div className="form-check form-check mb-1">
+                                                    <div className="form-check mb-1">
                                                         <input type="radio" name='visitor_settings' checked={finalObj?.behaviour?.visitor_settings === "ALL_VISITORS"} onChange={e => {
                                                             updatePresent({ ...finalObj, behaviour: { ...finalObj?.behaviour, visitor_settings: e.target.value } })
                                                         }} id='all' value={"ALL_VISITORS"} className="form-check-input cursor-pointer" /><label className="cursor-pointer" style={{ fontSize: "13px" }} htmlFor="all">All Visitors</label>
                                                     </div>
-                                                    <div className="form-check form-check mb-1">
+                                                    <div className="form-check mb-1">
                                                         <input type="radio" name='visitor_settings' checked={finalObj?.behaviour?.visitor_settings === "FIRST_VISITORS"} onChange={e => {
                                                             updatePresent({ ...finalObj, behaviour: { ...finalObj?.behaviour, visitor_settings: e.target.value } })
-                                                        }} id='first' value={"FIRST_VISITORS"} className="form-check-input cursor-pointer" /><label htmlFor="first" className="cursor-pointer" style={{ fontSize: "13px" }}>First Time Visitors</label>
+                                                        }} id='first' value={"FIRST_VISITORS"} className="form-check-input cursor-pointer" /><label htmlFor="first" className="cursor-pointer" style={{ fontSize: "13px" }}>First-Time Visitors</label>
                                                     </div>
-                                                    <div className="form-check form-check mb-1">
+                                                    <div className="form-check mb-1">
                                                         <input type="radio" name='visitor_settings' checked={finalObj?.behaviour?.visitor_settings === "RETURNING_VISITORS"} onChange={e => {
                                                             updatePresent({ ...finalObj, behaviour: { ...finalObj?.behaviour, visitor_settings: e.target.value } })
-                                                        }} id='return' value={"RETURNING_VISITORS"} className="form-check-input cursor-pointer" /><label htmlFor="return" className="cursor-pointer" style={{ fontSize: "13px" }}>Returning Visitors</label>
+                                                        }} id='return' value={"RETURNING_VISITORS"} className="form-check-input cursor-pointer" /><label htmlFor="return" className="cursor-pointer" style={{ fontSize: "13px" }}>Returning Shoppers</label>
                                                     </div>
-                                                    <div className="form-check form-check mb-1">
+                                                    <div className="form-check mb-1">
                                                         <input type="radio" name='visitor_settings' checked={finalObj?.behaviour?.visitor_settings === "REGISTERED_USERS"} onChange={e => {
                                                             updatePresent({ ...finalObj, behaviour: { ...finalObj?.behaviour, visitor_settings: e.target.value } })
                                                         }} id='registered' value={"REGISTERED_USERS"} className="form-check-input cursor-pointer" /><label htmlFor="registered" className="cursor-pointer" style={{ fontSize: "13px" }}>Registered Users</label>
@@ -2988,7 +3334,7 @@ const CustomizationParent = () => {
 
                                 {/* Display Section */}
                                 {sideNav === "display" && <div style={{ transition: "0.3s ease-in-out", overflowY: "auto", width: "240px", transform: `translateX(${sideNav === "display" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
-                                    <UncontrolledAccordion defaultOpen={['1', '2', '3', '4']} stayOpen>
+                                    <UncontrolledAccordion stayOpen>
                                         {/* Position */}
                                         <AccordionItem className='bg-white border-bottom'>
                                             <AccordionHeader className='acc-header border-bottom' targetId='1'>
@@ -3323,7 +3669,7 @@ const CustomizationParent = () => {
                                         {/* Pop up Active status */}
                                         <AccordionItem className='bg-white border-bottom'>
                                             <AccordionHeader className='acc-header border-bottom' targetId='4'>
-                                                <p className='m-0 fw-bolder text-black text-uppercase' style={{ fontSize: "0.75rem" }}>Pop-up visible on</p>
+                                                <p className='m-0 fw-bolder text-black text-uppercase' style={{ fontSize: "0.75rem" }}>Visible on</p>
                                             </AccordionHeader>
                                             <AccordionBody accordionId='4'>
                                                 <div className='p-0 mx-0 my-2'>
@@ -3383,15 +3729,51 @@ const CustomizationParent = () => {
                                 </div>}
                                 {/* Display Section */}
 
+                                {/* Trigger section */}
+                                {sideNav === "trigger" && <div style={{ transition: "0.3s ease-in-out", overflow: "hidden", width: "240px", transform: `translateX(${sideNav === "trigger" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
+                                    <div className="px-1">
+                                        <div className='p-0 mx-0 my-2'>
+                                            <Select value={visibleOnOptions?.filter(item => finalObj?.behaviour?.pop_up_load_type === item?.value)} onChange={e => {
+                                                updatePresent({ ...finalObj, behaviour: { ...finalObj.behaviour, pop_up_load_type: e.value, pop_up_load_value: "0" } })
+                                            }} options={visibleOnOptions} />
+                                        </div>
+                                        {finalObj.behaviour.pop_up_load_type === "scroll" && (
+                                            <div className="my-2">
+                                                <label style={{ fontSize: "12px" }} htmlFor="">Your pop up will be visible after scrolling {finalObj?.behaviour?.pop_up_load_value}% of the page</label>
+                                                <input type="range" step={10} min={0} max={100} value={finalObj.behaviour.pop_up_load_value} onChange={e => {
+                                                    updatePresent({ ...finalObj, behaviour: { ...finalObj.behaviour, pop_up_load_value: e.target.value } })
+                                                }} style={{ accentColor: "#727272" }} className='w-100 mt-1' />
+                                            </div>
+                                        )}
+                                        {finalObj.behaviour.pop_up_load_type === "delay" && (
+                                            <div className="my-2">
+                                                <label style={{ fontSize: "12px" }} htmlFor="">Your pop up will be visible {finalObj?.behaviour?.pop_up_load_value} seconds of loading</label>
+                                                <input type="range" min={0} max={120} value={finalObj?.behaviour?.pop_up_load_value} onChange={e => {
+                                                    updatePresent({ ...finalObj, behaviour: { ...finalObj?.behaviour, pop_up_load_value: e.target.value } })
+                                                }} style={{ accentColor: "#727272" }} className='w-100 mt-1' />
+                                            </div>
+                                        )}
+                                        {(finalObj?.behaviour?.pop_up_load_type === "scroll" || finalObj?.behaviour?.pop_up_load_type === "delay") && (
+                                            <div className='p-0 mx-0 my-1'>
+                                                <label htmlFor="" className='form-control-label' style={{ fontSize: "0.85rem" }} >Pop-up frequency: (appears {finalObj?.behaviour?.frequency ? finalObj?.behaviour?.frequency : "1"} time(s))</label>
+                                                <input value={finalObj?.behaviour?.frequency || 1} min={1} max={10} type="range" className='w-100' onChange={e => {
+                                                    updatePresent({ ...finalObj, behaviour: { ...finalObj?.behaviour, frequency: e.target.value } })
+                                                }} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>}
+                                {/* Trigger section */}
+
                                 {/* Elements section */}
-                                {sideNav === "add-elements" && <div style={{ transition: "0.3s ease-in-out", overflow: "hidden", width: "240px", transform: `translateX(${sideNav === "add-elements" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
+                                {sideNav === "add-elements" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "240px", transform: `translateX(${sideNav === "add-elements" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
                                     <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Basic Elements</p>
-                                    <div className="toggleSection border-end d-flex align-items-start justify-content-start mb-1" style={{ flexWrap: "wrap" }}>
+                                    <div className="toggleSection border-end d-flex align-items-stretch justify-content-start mb-1" style={{ flexWrap: "wrap" }}>
                                         {/* {getElementJsx({ draggable: true, dragStartFunc: (e) => handleDragStart(e, "text", "type"), icon: <Type size={17.5} />, label: "Text" })} */}
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "text", "type")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "text", "type")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <Type color="#727272" size={17.5} />
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Text</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Text</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3409,10 +3791,10 @@ const CustomizationParent = () => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "image")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "image")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <Image color="#727272" size={17.5} />
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Image</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Image</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3430,10 +3812,10 @@ const CustomizationParent = () => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "button")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "button")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <Square color="#727272" fill="#727272" size={17.5} style={{ scale: "225% 100%" }} />
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Button</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Button</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3453,9 +3835,9 @@ const CustomizationParent = () => {
                                         </div>
                                     </div>
                                     <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Form Elements</p>
-                                    <div className="toggleSection border-end d-flex align-items-start justify-content-start mb-1">
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "input")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                    <div className="toggleSection border-end d-flex flex-wrap align-items-stretch justify-content-start mb-1">
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "firstName")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     fill="none"
@@ -3477,7 +3859,7 @@ const CustomizationParent = () => {
                                                         fill="#727272"
                                                     />
                                                 </svg>
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Input</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>First name</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3495,10 +3877,174 @@ const CustomizationParent = () => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "tnc")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "lastName")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 52 52"
+                                                    width={25}
+                                                >
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M44 17H8a2 2 0 00-2 2v14a2 2 0 002 2h36a2 2 0 002-2V19a2 2 0 00-2-2zM8 15a4 4 0 00-4 4v14a4 4 0 004 4h36a4 4 0 004-4V19a4 4 0 00-4-4H8z"
+                                                        fill="#727272"
+                                                    />
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M10 20a1 1 0 011 1v10a1 1 0 11-2 0V21a1 1 0 011-1z"
+                                                        fill="#727272"
+                                                    />
+                                                </svg>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Last name</span>
+                                                <svg
+                                                    width={"35%"}
+                                                    viewBox="0 0 67 28"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <circle cx={5} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={5} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "email")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 52 52"
+                                                    width={25}
+                                                >
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M44 17H8a2 2 0 00-2 2v14a2 2 0 002 2h36a2 2 0 002-2V19a2 2 0 00-2-2zM8 15a4 4 0 00-4 4v14a4 4 0 004 4h36a4 4 0 004-4V19a4 4 0 00-4-4H8z"
+                                                        fill="#727272"
+                                                    />
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M10 20a1 1 0 011 1v10a1 1 0 11-2 0V21a1 1 0 011-1z"
+                                                        fill="#727272"
+                                                    />
+                                                </svg>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Email</span>
+                                                <svg
+                                                    width={"35%"}
+                                                    viewBox="0 0 67 28"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <circle cx={5} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={5} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "number")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 52 52"
+                                                    width={25}
+                                                >
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M44 17H8a2 2 0 00-2 2v14a2 2 0 002 2h36a2 2 0 002-2V19a2 2 0 00-2-2zM8 15a4 4 0 00-4 4v14a4 4 0 004 4h36a4 4 0 004-4V19a4 4 0 00-4-4H8z"
+                                                        fill="#727272"
+                                                    />
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M10 20a1 1 0 011 1v10a1 1 0 11-2 0V21a1 1 0 011-1z"
+                                                        fill="#727272"
+                                                    />
+                                                </svg>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Phone Number</span>
+                                                <svg
+                                                    width={"35%"}
+                                                    viewBox="0 0 67 28"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <circle cx={5} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={5} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "enter_otp")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 52 52"
+                                                    width={25}
+                                                >
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M44 17H8a2 2 0 00-2 2v14a2 2 0 002 2h36a2 2 0 002-2V19a2 2 0 00-2-2zM8 15a4 4 0 00-4 4v14a4 4 0 004 4h36a4 4 0 004-4V19a4 4 0 00-4-4H8z"
+                                                        fill="#727272"
+                                                    />
+                                                    <path
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M10 20a1 1 0 011 1v10a1 1 0 11-2 0V21a1 1 0 011-1z"
+                                                        fill="#727272"
+                                                    />
+                                                </svg>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>OTP</span>
+                                                <svg
+                                                    width={"35%"}
+                                                    viewBox="0 0 67 28"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <circle cx={5} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={5} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={5} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={24} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={43} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                    <circle cx={62} cy={23} r={3.5} stroke="#727272" strokeWidth={3} />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "tnc")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <CheckSquare size={25} color={"#727272"} />
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Newsletter</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Newsletter</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3517,12 +4063,12 @@ const CustomizationParent = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Structured Elements</p>
-                                    <div className="toggleSection border-end d-flex align-items-start justify-content-start mb-1">
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "col1")} className="border rounded text-dark w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                    <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Layout Elements</p>
+                                    <div className="toggleSection border-end d-flex align-items-stretch justify-content-start mb-1">
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "col1")} className="border rounded text-dark w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <Square size={17.5} />
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Block</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Block</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3545,12 +4091,12 @@ const CustomizationParent = () => {
                                 {/* Elements section */}
 
                                 {/* Button Section */}
-                                {sideNav === "button" && <div style={{ transition: "0.3s ease-in-out", overflow: "hidden", width: "240px", transform: `translateX(${sideNav === "button" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
-                                    <div style={{ flexWrap: "wrap" }} className="toggleSection border-end d-flex align-items-start justify-content-start mb-1">
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "text", "type")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                {sideNav === "button" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "240px", transform: `translateX(${sideNav === "button" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
+                                    <div style={{ flexWrap: "wrap" }} className="toggleSection border-end d-flex align-items-stretch justify-content-start mb-1">
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "text", "type")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <Type color="#727272" size={17.5} />
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Text</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Text</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3568,10 +4114,10 @@ const CustomizationParent = () => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                            <div draggable onDragStart={(e) => handleDragStart(e, "image")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
+                                        <div style={{ width: `50%`, padding: "1rem" }}>
+                                            <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "image")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)" }}>
                                                 <Image color="#727272" size={17.5} />
-                                                <span className='text-black' style={{ fontSize: "0.75rem" }}>Image</span>
+                                                <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Image</span>
                                                 <svg
                                                     width={"35%"}
                                                     viewBox="0 0 67 28"
@@ -3595,14 +4141,16 @@ const CustomizationParent = () => {
 
                                 {/* Offer Section */}
                                 {sideNav === "offers" && (
-                                    <div style={{ transition: "0.3s ease-in-out", overflow: "hidden", width: "240px", transform: `translateX(${sideNav === "offers" ? "0px" : "-240px"})`, position: "absolute", inset: "0px", maxHeight: "100%", overflow: "auto" }}>
-                                        <div className="toggleSection border-end d-flex align-items-start justify-content-start mb-1">
-                                            <div style={{ width: `${100 / 3}%`, padding: "0.25rem" }}>
-                                                <div draggable onDragStart={(e) => {
-                                                    handleDragStart(e, "offer", "type")
-                                                }} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)", cursor: "grab", opacity: "1" }}>
+                                    <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "240px", transform: `translateX(${sideNav === "offers" ? "0px" : "-240px"})`, position: "absolute", inset: "0px", maxHeight: "100%", overflow: "auto" }}>
+                                        <div className="toggleSection border-end d-flex align-items-stretch justify-content-start mb-1">
+                                            <div style={{ width: `50%`, padding: "1rem" }}>
+                                                <div draggable={isMobile ? phoneIsOfferDraggable : isOfferDraggable} onDragStart={(e) => {
+                                                    if (isMobile ? phoneIsOfferDraggable : isOfferDraggable) {
+                                                        handleDragStart(e, "offer", "type")
+                                                    }
+                                                }} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.5rem", boxShadow: "1px 1px 5px rgba(0,0,0,0.125)", cursor: isOfferDraggable ? "grab" : "default", opacity: isOfferDraggable ? "1" : "0.5" }}>
                                                     <Percent color='rgb(255, 103, 28)' size={17.5} />
-                                                    <span className='text-black' style={{ fontSize: "0.75rem" }}>Offer</span>
+                                                    <span className='text-black text-center' style={{ fontSize: "0.75rem" }}>Offer</span>
                                                     <svg
                                                         width={"35%"}
                                                         viewBox="0 0 67 28"
@@ -3624,12 +4172,13 @@ const CustomizationParent = () => {
                                         <UncontrolledAccordion defaultOpen={['1']} stayOpen>
                                             <AccordionItem className='bg-white border-bottom'>
                                                 <AccordionHeader className='acc-header border-bottom' targetId='1'>
-                                                    <p className='m-0 fw-bolder text-black text-uppercase' style={{ fontSize: "0.75rem" }}>Select Offers</p>
+                                                    <p className='m-0 fw-bolder text-black text-uppercase' style={{ fontSize: "0.75rem" }}>Add Offers</p>
                                                 </AccordionHeader>
                                                 <AccordionBody accordionId='1'>
                                                     {(gotOffers && Array.isArray(allOffers)) ? allOffers?.map((ele, key) => {
                                                         return (
                                                             <span className="position-relative" style={{ cursor: "pointer", outline: `2px solid ${finalObj?.selectedOffers?.some($ => $?.Code === ele.Code) ? "#FF671C" : "rgba(0,0,0,0)"}` }} onClick={() => {
+                                                                console.log("hi", finalObj?.selectedOffers)
                                                                 if (finalObj?.selectedOffers?.some($ => $?.Code === ele.Code)) {
                                                                     const newArr = [...finalObj.selectedOffers]
                                                                     updatePresent({ ...finalObj, selectedOffers: [...newArr?.filter(item => item.Code !== ele.Code)] })
@@ -3638,7 +4187,30 @@ const CustomizationParent = () => {
                                                                 }
                                                             }}>
                                                                 {/* {finalObj?.selectedOffers?.some($ => $?.Code === ele?.Code) && <span style={{ position: "absolute", inset: "0px 0px auto auto", transform: `translateX(35%) translateY(-35%)`, width: "25px", aspectRatio: "1", display: "flex", justifyContent: "center", alignItems: "center", color: "#FF671C", backgroundColor: "white", borderRadius: "100px", zIndex: "99999999999", border: "2px solid #FF671C" }}>{(finalObj?.selectedOffers?.findIndex($ => $?.Code === ele.Code)) + 1}</span>} */}
-                                                                <ReturnOfferHtml details={ele} key={key} theme={finalObj?.offerTheme} colors={finalObj?.offerProperties?.colors} />
+                                                                <div>
+                                                                    {/* <ReturnOfferHtml details={ele} key={key} theme={finalObj?.offerTheme} colors={finalObj?.offerProperties?.colors} /> */}
+                                                                    <Card key={key} style={{ filter: "drop-shadow(rgba(0, 0, 0, 0.2) 0px 0px 10px)" }}>
+                                                                        <CardBody style={{ padding: "10px" }}>
+                                                                            <div>
+
+                                                                                <div>
+                                                                                    <span style={{ fontSize: "13px" }}>Code: <span className=' text-black '>{ele?.Code}</span></span>
+                                                                                </div>
+                                                                                <div className='mt-1'>
+                                                                                    <span style={{ fontSize: "13px" }}>Offer: <span className=' text-black'>{ele?.Type === "PERCENTAGE" ? `${Math.ceil(ele?.Value)}%` : `${userPermission?.currencySymbol}${Math.ceil(ele?.Value)}`}</span></span>
+                                                                                </div>
+
+                                                                                <div className='mt-1'>
+                                                                                    <span style={{ fontSize: "13px" }}>Summary: <br /> <span className=' text-black'> {ele?.Summary} </span></span>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <p style={{ fontSize: "13px" }} className='mt-1'>Validity: <br /><span className=' text-black'>{ele?.ValidityPeriod?.end ? moment(ele?.ValidityPeriod?.end).format("YYYY-MM-DD HH:mm:ss") : "Never ending"}</span></p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </CardBody>
+                                                                    </Card>
+                                                                </div>
+
                                                             </span>
                                                         )
                                                     }) : (
@@ -3646,7 +4218,7 @@ const CustomizationParent = () => {
                                                             <Spinner />
                                                         </div>
                                                     )}
-                                                    <div><button onClick={() => navigate("/merchant/SuperLeadz/create_offers/")} className="btn btn-dark w-100">Add{allOffers?.length >= 1 ? " more" : ""} offers</button></div>
+                                                    <div><button onClick={() => navigate("/merchant/SuperLeadz/create_offers/")} className="btn btn-dark w-100">Create new offer</button></div>
                                                 </AccordionBody>
                                             </AccordionItem>
                                         </UncontrolledAccordion>
@@ -3655,11 +4227,11 @@ const CustomizationParent = () => {
                                 {/* Offer Section */}
 
                                 {/* Criteria section */}
-                                {sideNav === "criteria" && <div style={{ transition: "0.3s ease-in-out", overflow: "hidden", width: "240px", transform: `translateX(${sideNav === "criteria" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
+                                {sideNav === "criteria" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "240px", transform: `translateX(${sideNav === "criteria" ? "0px" : "-240px"})`, position: "absolute", inset: "0px" }}>
                                     <UncontrolledAccordion defaultOpen={['1', '2']} stayOpen>
                                         <AccordionItem className='bg-white border-bottom'>
                                             <AccordionHeader className='acc-header border-bottom' targetId='1'>
-                                                <p className='m-0 fw-bolder text-black text-uppercase' style={{ fontSize: "0.75rem" }}>Campaign Duration</p>
+                                                <p className='m-0 fw-bolder text-black text-uppercase' style={{ fontSize: "0.75rem" }}>Schedule Campaign</p>
                                             </AccordionHeader>
                                             <AccordionBody accordionId='1'>
                                                 <div className='p-0 mx-0 my-1'>
@@ -3686,7 +4258,7 @@ const CustomizationParent = () => {
                         {/* Section Drawer */}
                         {/* Theme Preview */}
                         <div className="d-flex flex-column flex-grow-1 align-items-center bg-light-secondary">
-                            {returnRender({ outletData, slPrevBg, bgsettings: finalObj?.overlayStyles, currPage, setCurrPage, currPosition, setCurrPosition, indexes, setIndexes, popPosition: finalObj?.positions?.[`${mobileCondition}${pageCondition}`], bgStyles: finalObj?.backgroundStyles?.[`${mobileCondition}main`], crossStyle: finalObj?.crossButtons[`${pageCondition}`], values, setValues, showBrand, handleColDrop, handleDragOver, handleElementDrop, handleLayoutDrop, handleRearrangeElement, mouseEnterIndex, setMouseEnterIndex, mousePos, setMousePos, isEqual, makActive, colWise: currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values], setcolWise, setDragStartIndex, dragOverIndex, setDragOverIndex, isMobile, finalObj, setFinalObj: updatePresent, mobileCondition, openPage, setOpenPage, brandStyles, gotOffers, setTransfered, sideNav, setSideNav, btnStyles: finalObj?.backgroundStyles[`${mobileCondition}button`], offerTheme: finalObj?.offerTheme, navigate, triggerImage, gotDragOver, setGotDragOver, indicatorPosition, setIndicatorPosition })}
+                            {returnRender({ outletData, slPrevBg, bgsettings: finalObj?.overlayStyles, currPage, setCurrPage, currPosition, setCurrPosition, indexes, setIndexes, popPosition: finalObj?.positions?.[`${mobileCondition}${pageCondition}`], bgStyles: finalObj?.backgroundStyles?.[`${mobileCondition}main`], crossStyle: finalObj?.crossButtons[`${pageCondition}`], values, setValues, showBrand, handleColDrop, handleDragOver, handleElementDrop, handleLayoutDrop, handleRearrangeElement, mouseEnterIndex, setMouseEnterIndex, mousePos, setMousePos, isEqual, makActive, colWise: currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values], setcolWise, setDragStartIndex, dragOverIndex, setDragOverIndex, isMobile, finalObj, setFinalObj: updatePresent, mobileCondition, openPage, setOpenPage, brandStyles, gotOffers, setTransfered, sideNav, setSideNav, btnStyles: finalObj?.backgroundStyles[`${mobileCondition}button`], offerTheme: finalObj?.offerTheme, navigate, triggerImage, gotDragOver, setGotDragOver, indicatorPosition, setIndicatorPosition, selectedOffer, setSelectedOffer, renamePage, setRenamePage, pageName, setPageName, undo })}
                         </div>
                         {/* Theme Preview */}
                         {/* Edit Section */}

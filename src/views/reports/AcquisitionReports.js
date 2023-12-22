@@ -20,31 +20,31 @@ const AcquisitionReports = () => {
     const defferContent = <>
         <Row className='justify-content-end mx-0'>
             <Col className='d-flex align-items-center justify-content-start' md='4' sm='12'>
-                <div className='d-flex justify-content-start align-items-center gap-2'>
-                    <label>
-                        Show
-                    </label>
-                    <select className='form-control' value={currentEntry} onChange={(e) => {
-                        setCurrentEntry(Number(e.target.value))
-                    }} style={{ appearance: 'auto' }}>
-                        {pageNo.map(page => <option value={page.value}>{page.label}</option>)}
-                    </select>
+            <div className='d-flex justify-content-start align-items-center gap-2'>
+                <label>
+                Show
+                </label>
+                <select className='form-control' value={currentEntry}  onChange={(e) => {
+                setCurrentEntry(Number(e.target.value))
+                }} style={{ appearance: 'auto' }}>
+                {pageNo.map(page => <option value={page.value}>{page.label}</option>)}
+                </select>
 
-                </div>
+            </div>
             </Col>
             <Col className='d-flex align-items-center justify-content-center' md='4' sm='12'>
                 <h4 className='m-0'>Acquisition Reports</h4>
             </Col>
             <Col className='d-flex align-items-center justify-content-end' md='4' sm='12'>
                 <Input
-                    className='dataTable-filter form-control ms-1'
-                    style={{ width: `180px`, height: `2.714rem` }}
-                    type='text'
-                    bsSize='sm'
-                    id='search-input-1'
-                    placeholder='Search...'
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                className='dataTable-filter form-control ms-1'
+                style={{ width: `180px`, height: `2.714rem` }}
+                type='text'
+                bsSize='sm'
+                id='search-input-1'
+                placeholder='Search...'
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
                 />
             </Col>
         </Row>
@@ -87,17 +87,17 @@ const AcquisitionReports = () => {
     const getData = () => {
         setIsLoading(true)
         getReq('AcquisitionReports', `?page=${currentPage + 1}&size=${currentEntry}&searchValue=${searchValue}`)
-            .then((resp) => {
-                console.log(resp)
-                setData(resp?.data?.data)
-                setCount(resp?.data?.count)
-                setUsageData({ ...usageData, customer_list: resp?.data?.customers_list })
-                setIsLoading(false)
-            })
-            .catch((error) => {
-                console.log(error)
-                setIsLoading(false)
-            })
+        .then((resp) => {
+            console.log(resp)
+            setData(resp?.data?.data)
+            setCount(resp?.data?.count)
+            setUsageData({...usageData, customer_list: resp?.data?.customers_list})
+            setIsLoading(false)
+        })
+        .catch((error) => {
+            console.log(error)
+            setIsLoading(false)
+        })
     }
 
     useEffect(() => {
@@ -106,7 +106,7 @@ const AcquisitionReports = () => {
             const request = setTimeout(() => {
                 getData()
             }, delay)
-
+    
             return () => {
                 clearTimeout(request)
             }
@@ -116,7 +116,6 @@ const AcquisitionReports = () => {
     useEffect(() => {
         getData()
     }, [currentPage, currentEntry])
-    console.log("current_page, current_entry", currentPage, currentEntry)
 
     return (
         <>

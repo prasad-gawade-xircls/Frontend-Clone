@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronLeft } from 'react-feather'
 
-const ModificationSection = ({ styles, general, advanced, currPosition, setCurrPosition }) => {
+const ModificationSection = ({ styles, general, spacing, currPosition, setCurrPosition }) => {
 
-    // console.log(styles, general, advanced, currPosition.selectedType)
+    // console.log(styles, general, spacing, currPosition.selectedType)
 
     const list = [
         {
@@ -15,20 +15,20 @@ const ModificationSection = ({ styles, general, advanced, currPosition, setCurrP
             value: styles
         },
         {
-            label: "advanced",
-            value: advanced
+            label: "spacing",
+            value: spacing
         }
     ]
 
-    const initialActiveMenu = general ? "general" : (styles ? "style" : "advanced")
+    const initialActiveMenu = general ? "general" : (styles ? "style" : "spacing")
     const [activeMenu, setActiveMenu] = useState(initialActiveMenu)
     // const [activeMenu, setActiveMenu] = useState(() => {
-    //     const activeIndex = list.findIndex(ele => ele.value === general || ele.value === styles || ele.value === advanced)
+    //     const activeIndex = list.findIndex(ele => ele.value === general || ele.value === styles || ele.value === spacing)
     //     return general ? activeIndex !== -1 ? (list[activeIndex].label) : (general ? "general" : "style") : "style"
     // })   
     // console.log(activeMenu)
     useEffect(() => {
-        const initialActiveMenu = general ? "general" : (styles ? "style" : "advanced")
+        const initialActiveMenu = general ? "general" : (styles ? "style" : "spacing")
         setActiveMenu(initialActiveMenu)
     }, [currPosition])
     return (
@@ -64,8 +64,8 @@ const ModificationSection = ({ styles, general, advanced, currPosition, setCurrP
                     {activeMenu === "style" && (
                         <>{styles}</>
                     )}
-                    {activeMenu === "advanced" && (
-                        <>{advanced}</>
+                    {activeMenu === "spacing" && (
+                        <>{spacing}</>
                     )}
                 </div>
             </div>

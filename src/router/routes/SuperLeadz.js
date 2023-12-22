@@ -11,11 +11,6 @@ import Rules from '../../views/SuperLeadz/campaignView/Rules'
 import Duration from '../../views/SuperLeadz/campaignView/Duration'
 import Campaign from '../../views/SuperLeadz/reports/Campaign'
 import Offers from '../../views/SuperLeadz/reports/Offers'
-import View from '../../views/SuperLeadz/View'
-// import Overview from '../../views/Components/SuperLeadz/views/Overview'
-// import Appearance from '../../views/Components/SuperLeadz/views/Appearance'
-// import Rules from '../../views/Components/SuperLeadz/views/Rules'
-// import Duration from '../../views/Components/SuperLeadz/views/Duration'
 const CreateOffers = lazy(() => import('../../views/SuperLeadz/CreateOffers'))
 const EditSupport = lazy(() => import('../../views/SuperLeadz/EditSupport'))
 const LiveUpdates = lazy(() => import('../../views/SuperLeadz/Live'))
@@ -23,13 +18,13 @@ const CustomTemplate = lazy(() => import('../../views/SuperLeadz/Customization/C
 const ButtonPosition = lazy(() => import('../../views/SuperLeadz/Customization/ButtonPosition'))
 const Intro = lazy(() => import('../../views/SuperLeadz/Intro/Intro'))
 const TheAudience = lazy(() => import('../../views/SuperLeadz/Intro/TheAudience'))
-const Editbutton = lazy(() => import('../../views/SuperLeadz/Intro/Editbutton'))
-const TheButton = lazy(() => import('../../views/SuperLeadz/Intro/TheButton'))
+const Editbutton = lazy(() => import('../../views/SuperLeadz/Intro/Editbutton')) 
+const TheButton = lazy(() => import('../../views/SuperLeadz/Intro/TheButton')) 
 const Discount = lazy(() => import('../../views/SuperLeadz/Intro/Discount'))
-const JoinUs = lazy(() => import('../../views/SuperLeadz/JoinUs'))
-const FormEditor = lazy(() => import('../../views/FormBuilder/FormBuilder(components)/FormEditor'))
-const MyFormBuilder = lazy(() => import('../../views/FormBuilder/MyFormBuilder'))
-const NewCustomization = lazy(() => import('../../views/SuperLeadz/Customization/NewCustomization'))
+const JoinUs = lazy(() => import('../../views/SuperLeadz/JoinUs')) 
+const FormEditor = lazy(() => import('../../views/FormBuilder/FormBuilder(components)/FormEditor')) 
+const MyFormBuilder = lazy(() => import('../../views/FormBuilder/MyFormBuilder')) 
+const NewCustomization = lazy(() => import('../../views/SuperLeadz/Customization/NewCustomization')) 
 const SuperLeadzDashboard = lazy(() => import('../../views/SuperLeadz/Dashboard'))
 const SuperLeadzLeads = lazy(() => import('../../views/SuperLeadz/Leads'))
 const SuperLeadzPerformance = lazy(() => import('../../views/SuperLeadz/Performance'))
@@ -44,7 +39,7 @@ const Editor = lazy(() => import('../../views/NewCustomizationFlow/Editor'))
 
 const SuperLeads_Routes = [
   {
-    path: '/merchant/SuperLeadz/joinus/',
+    path: '/merchant/:appName/joinus/',
     element: <JoinUs />
   },
   {
@@ -115,29 +110,29 @@ const SuperLeads_Routes = [
   {
     path: '/merchant/SuperLeadz/live/',
     element: <LiveUpdates />
-  },
+  }, 
   {
     path: '/merchant/SuperLeadz/CustomTemplate/',
     element: <CustomTemplate />
-  },
+  }, 
   {
     path: '/merchant/SuperLeadz/ButtonPosition/',
     element: <ButtonPosition />
-  },
+  }, 
   {
     path: '/merchant/SuperLeadz/MyFormBuilder/',
     element: <FormEditor />,
     meta: {
       layout: 'fullWidthLayout'
     }
-  },
+  }, 
   {
     path: '/merchant/SuperLeadz/quilltest/',
     element: <QuillTest />,
     meta: {
       layout: 'fullWidthLayout'
     }
-  },
+  }, 
   {
     path: '/merchant/SuperLeadz/Themes/',
     element: <Themes />

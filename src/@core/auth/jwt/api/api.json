@@ -1,0 +1,6 @@
+{
+    "api_link": "https://apps.demo.xircls.in/referral/referralpoints/",
+    "auth_key": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjk2MDA3ODIyLCJpYXQiOjE2OTU5Nzc4MjIsImp0aSI6IjU1ZWVjNzI0Mzc4MDQwMWRhNzY1MDRlMjgwYzFkNGMwIiwidXNlcl9pZCI6MzA3ODE3fQ.bA0s6Bpf7BQbPQlTgCqQZyav0TGcrDp9yfk8n413w_Y",
+    "api_key": "Fv14sMRkz8uYqd3VMbKy5U+7h6QE4Rcb7MeG1d/PoXU=",
+    "d_ngrok": "https://4fb9-2405-201-7-8937-206-c646-a14a-8000.ngrok-free.app"
+}

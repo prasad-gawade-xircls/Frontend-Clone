@@ -7,13 +7,13 @@ import { baseURL } from '../../assets/auth/jwtService'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { dashboardURL } from '../Validator'
+import countries from '../NewFrontBase/Country'
 
 const Processing = () => {
     const { setUserPermission } = useContext(PermissionProvider)
     const location = useLocation()
     const params = new URLSearchParams(location.search)
     const navigate = useNavigate()
-    // console.log(params.get('app'))
     // console.log(params.get('shop'))
     const loginUser = () => {
       // localStorage.setItem('app_name', params.get('app'))
@@ -22,6 +22,8 @@ const Processing = () => {
       form_data.append('email', params.get('email').replaceAll(" ", "+"))
       form_data.append('app', params.get('app'))
       form_data.append('platform', params.get('platform'))
+      form_data.append('currency', params.get('currency'))
+      form_data.append('shopify_xircls_app_id', params.get('shopify_xircls_app_id'))
 
       const time = new Date().getTime()
       axios.post(`${baseURL}/merchant/plugin/login/?time=${time}`, form_data)
@@ -29,19 +31,21 @@ const Processing = () => {
         console.log(res)
         const tokenValue = JSON.stringify(res?.data?.token)
         setToken(tokenValue)
-
+        const merchantCurrency = countries.filter((curElem) => curElem?.currency?.code === res?.data?.outlet_list[0]?.outlet_currency)
         const updatedPermission = {
           appName: params.get('app'),
           multipleDomain: res?.data?.outlet_list,
           apiKey: res?.data?.outlet_list[0].api_key,
-          installedApps: res.data.installed_apps
+          installedApps: res.data.installed_apps,
+          campagin: res?.data?.status,
+          currencySymbol: merchantCurrency[0]?.currency?.symbol
         }
 
         console.log(updatedPermission)
 
         setUserPermission((curData) => ({
-            ...curData,
-            ...updatedPermission
+          ...curData,
+          ...updatedPermission
         }))
         
         if (res?.status === 200 && tokenValue) {

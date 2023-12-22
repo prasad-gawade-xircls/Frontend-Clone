@@ -390,9 +390,9 @@ const Dashboard = () => {
                                             </Row>
                                             <Row className='mt-2'>
                                                 <Col xl='6'>
-                                                    <p className="card-text font-small-3 mb-1"><b>Plan Amount: ₹{Number(data?.spent_amt) + Number(data?.balance_amt)} </b></p>
-                                                    <p className="card-text font-small-3 mb-1"><b>Spent: ₹{data?.spent_amt} </b></p>
-                                                    <p className="card-text font-small-3 mb-1"><b>Balance: ₹{data?.balance_amt} </b></p>
+                                                    <p className="card-text font-small-3 mb-1"><b>Plan Amount: {userPermission?.currencySymbol}{Number(data?.plan_amount)} </b></p>
+                                                    <p className="card-text font-small-3 mb-1"><b>Spent: {userPermission?.currencySymbol}{data?.spent_amt} </b></p>
+                                                    <p className="card-text font-small-3 mb-1"><b>Balance: {userPermission?.currencySymbol}{data?.balance_amt} </b></p>
                                                 </Col>
                                             </Row>
                                             <br />

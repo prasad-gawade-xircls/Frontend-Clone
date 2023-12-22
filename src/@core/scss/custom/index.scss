@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
 
-.btn-primary,
-.btn-outline-primary {
+.btn-primary, .btn-outline-primary {
     background: transparent !important;
     border: 1px solid #464646 !important;
     color: #000 !important;
@@ -18,31 +17,21 @@
     color: #006aff !important;
 }
 
-a.btn-primary,
-a.btn-outline-primary {
+a.btn-primary, a.btn-outline-primary {
     color: #464646 !important
 }
 
-[dir] .btn-primary:focus,
-[dir] .btn-primary:active,
-[dir] .btn-primary.active {
-    background-color: transparent !important;
+[dir] .btn-primary:focus, [dir] .btn-primary:active, [dir] .btn-primary.active {
+	background-color: transparent !important;
 }
 
-[dir] .btn-primary:hover:not(.disabled):not(:disabled),
-.btn-primary:focus,
-[dir] .btn-primary:active,
-[dir] .btn-primary.active,
-.btn-primary:focus,
-[dir] .btn-primary:active,
-[dir] .btn-primary.active {
-    box-shadow: 0 4px 25px -8px #464646 !important;
+[dir] .btn-primary:hover:not(.disabled):not(:disabled), .btn-primary:focus, [dir] .btn-primary:active, [dir] .btn-primary.active, .btn-primary:focus, [dir] .btn-primary:active, [dir] .btn-primary.active {
+	box-shadow: 0 4px 25px -8px #464646 !important;
     background: transparent !important;
 }
 
-[dir] .btn:not(:disabled):not(.disabled):active:focus,
-[dir] .btn:not(:disabled):not(.disabled).active:focus {
-    box-shadow: 0 4px 25px -8px #464646 !important;
+[dir] .btn:not(:disabled):not(.disabled):active:focus, [dir] .btn:not(:disabled):not(.disabled).active:focus {
+	box-shadow: 0 4px 25px -8px #464646 !important;
 }
 
 .btn-primary-main:hover {
@@ -54,13 +43,12 @@ a.btn-outline-primary {
 }
 
 .vertical-layout .main-menu .navigation a.active {
-    box-shadow: 0 4px 15px -8px #464646 !important;
+	box-shadow: 0 4px 15px -8px #464646 !important;
     background: none !important;
     color: #464646 !important
 }
 
-.dark-layout,
-.semi-dark-layout {
+.dark-layout, .semi-dark-layout {
     // .btn-primary, .btn-outline-primary {
     //     background: transparent !important;
     //     border: 1px solid #cccbcb !important;
@@ -72,11 +60,10 @@ a.btn-outline-primary {
         background: #c7cbcf !important;
         color: #464646 !important;
     }
-
     .vertical-layout .main-menu .navigation a.active svg {
         color: #283046 !important;
     }
-
+    
 
     // a {
     //     color: #464646 !important
@@ -629,7 +616,7 @@ a.btn-outline-primary {
         position: absolute;
         z-index: -1;
         border-radius: 5px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
         transition: 0.25s ease;
     }
 
@@ -743,7 +730,6 @@ a.btn-outline-primary {
         text-underline-offset: 3px !important;
         // text-shadow: 0px 0px 45px #fbcd0c !important
     }
-
 
     @media screen and (max-height: 450px) {
         .sidenav {
@@ -2217,7 +2203,7 @@ a.btn-outline-primary {
 
 }
 
-[dir=ltr] .row>* {
+[dir=ltr] .row > * {
     padding-right: calc(var(--bs-gutter-x) * .2) !important;
     padding-left: calc(var(--bs-gutter-x) * .2) !important;
 }
@@ -2242,8 +2228,7 @@ a.btn-outline-primary {
     margin-left: 1.8rem !important;
 }
 
-[dir=ltr] .vertical-layout.vertical-menu-modern.menu-collapsed .app-content,
-[dir=ltr] .vertical-layout.vertical-menu-modern.menu-collapsed .footer {
+[dir=ltr] .vertical-layout.vertical-menu-modern.menu-collapsed .app-content, [dir=ltr] .vertical-layout.vertical-menu-modern.menu-collapsed .footer {
     margin-left: 70px !important;
 }
 

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react"
+import React, {useContext, useEffect} from "react"
 import { Pagination, Navigation, Autoplay } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react/swiper-react.js'
 import $ from 'jquery'
@@ -7,19 +7,21 @@ import 'swiper/modules/pagination/pagination.min.css'
 import 'swiper/modules/navigation/navigation.min.css'
 import 'swiper/modules/autoplay/autoplay.min.css'
 import { Card, CardBody } from 'reactstrap'
+import { PermissionProvider } from "../../../Helper/Context"
 
 const Swipe = () => {
 
+    const { userPermission } = useContext(PermissionProvider)
 
     const cardsDetails = [
         {
             cardId: 'id1',
             feature: 'Infiniti FREE PLAN',
-            plancost: '₹ 0.00',
+            plancost: `${userPermission?.currencySymbol} 0.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.00',
-            retcost: '₹ 0.00',
-            cpclick: '₹ 0.00',
+            acqcost: `${userPermission?.currencySymbol} 0.00`,
+            retcost: `${userPermission?.currencySymbol} 0.00`,
+            cpclick: `${userPermission?.currencySymbol} 0.00`,
             innxls: '2',
             color: '#3c90df',
             color2: 'rgba(60, 144, 223, 0.25)',
@@ -28,11 +30,11 @@ const Swipe = () => {
         {
             cardId: 'id2',
             feature: 'Infiniti Lite',
-            plancost: '₹ 999.00',
+            plancost: `${userPermission?.currencySymbol} 999.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.66',
-            retcost: '₹ 0.66',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.66`,
+            retcost: `${userPermission?.currencySymbol} 0.66`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '2',
             color: '#82b54b',
             color2: 'rgba(130, 181, 75, 0.25)',
@@ -41,11 +43,11 @@ const Swipe = () => {
         {
             cardId: 'id3',
             feature: 'Infiniti Grow',
-            plancost: '₹ 1,499.00',
+            plancost: `${userPermission?.currencySymbol} 1,499.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.66',
-            retcost: '₹ 0.66',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.66`,
+            retcost: `${userPermission?.currencySymbol} 0.66`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '3',
             color: '#e04f1a',
             color2: 'rgba(224, 79, 26, 0.25)',
@@ -55,11 +57,11 @@ const Swipe = () => {
         {
             cardId: 'id4',
             feature: 'Infiniti Grow Plus',
-            plancost: '₹ 2,499.00',
+            plancost: `${userPermission?.currencySymbol} 2,499.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.66',
-            retcost: '₹ 0.66',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.66`,
+            retcost: `${userPermission?.currencySymbol} 0.66`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '5',
             color: '#2345ed',
             color2: 'rgba(35, 69, 237, 0.25)',
@@ -68,11 +70,11 @@ const Swipe = () => {
         {
             cardId: 'id5',
             feature: 'Infiniti Pro',
-            plancost: '₹ 4,999.00',
+            plancost: `${userPermission?.currencySymbol} 4,999.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.66',
-            retcost: '₹ 0.66',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.66`,
+            retcost: `${userPermission?.currencySymbol} 0.66`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '5',
             color: '#8f34eb',
             color2: 'rgba(143, 52, 235, 0.25)',
@@ -81,11 +83,11 @@ const Swipe = () => {
         {
             cardId: 'id6',
             feature: 'Infiniti Pro Plus',
-            plancost: '₹ 9,999.00',
+            plancost: `${userPermission?.currencySymbol} 9,999.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.63',
-            retcost: '₹ 0.63',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.63`,
+            retcost: `${userPermission?.currencySymbol} 0.63`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '10',
             color: '#a832a6',
             color2: 'rgba(168, 50, 166, 0.25)',
@@ -94,11 +96,11 @@ const Swipe = () => {
         {
             cardId: 'id7',
             feature: 'Infiniti Premium',
-            plancost: '₹ 19,999.00',
+            plancost: `${userPermission?.currencySymbol} 19,999.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.59',
-            retcost: '₹ 0.59',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.59`,
+            retcost: `${userPermission?.currencySymbol} 0.59`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '15',
             color: '#f9a825',
             color2: 'rgba(249, 168, 37, 0.25)',
@@ -107,11 +109,11 @@ const Swipe = () => {
         {
             cardId: 'id8',
             feature: 'Infiniti Premium Plus',
-            plancost: '₹ 29,999.00',
+            plancost: `${userPermission?.currencySymbol} 29,999.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.56',
-            retcost: '₹ 0.56',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.56`,
+            retcost: `${userPermission?.currencySymbol} 0.56`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '20',
             color: '#e58b1d',
             color2: 'rgba(229, 139, 29, 0.25)',
@@ -120,11 +122,11 @@ const Swipe = () => {
         {
             cardId: 'id9',
             feature: 'Infiniti Enterprise',
-            plancost: '₹ 49,999.00',
+            plancost: `${userPermission?.currencySymbol} 49,999.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.53',
-            retcost: '₹ 0.53',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.53`,
+            retcost: `${userPermission?.currencySymbol} 0.53`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '25',
             color: '#0d47a1',
             color2: 'rgba(13, 71, 161, 0.25)',
@@ -133,11 +135,11 @@ const Swipe = () => {
         {
             cardId: 'id10',
             feature: 'Infiniti Enterprise Plus',
-            plancost: '₹ 99,999.00',
+            plancost: `${userPermission?.currencySymbol} 99,999.00`,
             partners: 'Unlimited',
-            acqcost: '₹ 0.50',
-            retcost: '₹ 0.50',
-            cpclick: '₹ 1.00',
+            acqcost: `${userPermission?.currencySymbol} 0.50`,
+            retcost: `${userPermission?.currencySymbol} 0.50`,
+            cpclick: `${userPermission?.currencySymbol} 1.00`,
             innxls: '30',
             color: '#827717',
             color2: 'rgba(130, 119, 23, 0.25)',

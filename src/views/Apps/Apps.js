@@ -95,24 +95,24 @@ const Apps = () => {
           <Row className="match-height">
 
             {
-              !data?.isLoading ? userApps?.map((curElem) => {
-                return curElem.name.toLowerCase() === "infiniti" ? <>
+              !data?.isLoading ? userApps?.filter((curElem) => curElem.is_active).map((curElem) => {
+                return <>
                   <Col md="4">
                     <AppCom 
-                      title={curElem.name}
-                      data={<>Get to know your customer better & recommend <br /> products that are fit for them! </>}
-                      button={userPermission?.installedApps.includes(curElem.name.toLowerCase()) ? (
+                      title={curElem?.name}
+                      data={curElem?.description}
+                      button={userPermission?.installedApps.includes(curElem?.slug?.toLowerCase()) ? (
                         <a onClick={() => {
-                          setUserPermission({...userPermission, appName: curElem.name.toLowerCase()})
-                          navigate(dashboardURL[curElem.name.toLowerCase()])
-                        }} 
-                        className="btn btn-primary"
-                      >
+                          setUserPermission({...userPermission, appName: curElem?.slug?.toLowerCase()})
+                            navigate(dashboardURL[curElem?.slug?.toLowerCase()])
+                          }}
+                          className="btn btn-primary"
+                        >
                         Dashboard
                       </a>
                       ) : (
                         <a onClick={() => {
-                          setData({...data, selectApp: curElem.name.toLowerCase()})
+                          setData({...data, selectApp: curElem?.slug?.toLowerCase()})
                           setEditModal(!editModal)
                         }} className="btn btn-primary">
                           Install App
@@ -120,103 +120,7 @@ const Apps = () => {
                       )
                       } />
                   </Col>
-              </> : curElem.name.toLowerCase() === "superleadz" ? <>
-                  <Col md="4">
-                    <AppCom 
-                      title={curElem.name}
-                      data={<>Convert website leads into sales in the <br /> shortest time possible!</>}
-                      button={userPermission?.installedApps.includes(curElem.name.toLowerCase()) ? (
-                        <a onClick={() => {
-                          setUserPermission({...userPermission, appName: curElem.name.toLowerCase()})
-                          navigate(dashboardURL[curElem.name.toLowerCase()])
-                        }} 
-                        className="btn btn-primary"
-                      >
-                        Dashboard
-                      </a>
-                      ) : (
-                        <a onClick={() => {
-                          setData({...data, selectApp: curElem.name.toLowerCase()})
-                          setEditModal(!editModal)
-                        }} className="btn btn-primary">
-                          Install App
-                        </a>
-                      )
-                      } />
-                  </Col>
-              </> : curElem.name.toLowerCase() === "referral" ? <>
-                  <Col md="4">
-                    <AppCom 
-                      title={curElem.name}
-                      data={<>Convert website leads into sales in the <br /> shortest time possible!</>}
-                      button={userPermission?.installedApps.includes(curElem.name.toLowerCase()) ? (
-                        <a onClick={() => {
-                          setUserPermission({...userPermission, appName: curElem.name.toLowerCase()})
-                          navigate(dashboardURL[curElem.name.toLowerCase()])
-                        }} 
-                        className="btn btn-primary"
-                      >
-                        Dashboard
-                      </a>
-                      ) : (
-                        <a onClick={() => {
-                          setData({...data, selectApp: curElem.name.toLowerCase()})
-                          setEditModal(!editModal)
-                        }} className="btn btn-primary">
-                          Install App
-                        </a>
-                      )
-                      } />
-                  </Col>
-                </> : curElem.name.toLowerCase() === "flash_accounts" ? <>
-                  <Col md="4">
-                    <AppCom 
-                      title={'Flash Account'}
-                      data={<>Super-fast sign-ups that don’t disrupt the buying process.</>}
-                      button={userPermission?.installedApps.includes(curElem.name.toLowerCase()) ? (
-                        <a onClick={() => {
-                          setUserPermission({...userPermission, appName: curElem.name.toLowerCase()})
-                          navigate(dashboardURL[curElem.name.toLowerCase()])
-                        }} 
-                        className="btn btn-primary"
-                      >
-                        Dashboard
-                      </a>
-                      ) : (
-                        <a onClick={() => {
-                          setData({...data, selectApp: curElem.name.toLowerCase()})
-                          setEditModal(!editModal)
-                        }} className="btn btn-primary">
-                          Install App
-                        </a>
-                      )
-                      } />
-                  </Col>
-                </> : curElem.name.toLowerCase() === "reports" ? <>
-                  <Col md="4">
-                    <AppCom 
-                      title={'Reports'}
-                      data={<>Super-fast sign-ups that don’t disrupt the buying process.</>}
-                      button={userPermission?.installedApps.includes(curElem.name.toLowerCase()) ? (
-                        <a onClick={() => {
-                          setUserPermission({...userPermission, appName: curElem.name.toLowerCase()})
-                          navigate(dashboardURL[curElem.name.toLowerCase()])
-                        }} 
-                        className="btn btn-primary"
-                      >
-                        Dashboard
-                      </a>
-                      ) : (
-                        <a onClick={() => {
-                          setData({...data, selectApp: curElem.name.toLowerCase()})
-                          setEditModal(!editModal)
-                        }} className="btn btn-primary">
-                          Install App
-                        </a>
-                      )
-                      } />
-                  </Col>
-                </> : ''
+                </>
 
               }) : <div className="mt-2 d-flex justify-content-center align-items-center">
                 <Spinner size={'40px'} />

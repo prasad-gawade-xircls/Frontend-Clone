@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Info, Percent } from 'react-feather'
 import { useNavigate } from 'react-router-dom'
 import Select from 'react-select'
@@ -6,8 +6,10 @@ import { Card, CardBody } from 'reactstrap'
 import { getCurrentOutlet } from '../Validator'
 import { SuperLeadzBaseURL } from '../../assets/auth/jwtService'
 import "../NewFrontBase/NewFrontBase.css"
+import { PermissionProvider } from '../../Helper/Context'
 
 const SuperLeadzCreateOffers = () => {
+    const { userPermission } = useContext(PermissionProvider)
     const [curStep, setCurStep] = useState(1)
     const [offerData, setOfferData] = useState({
         discount_code: "",
@@ -482,7 +484,7 @@ const SuperLeadzCreateOffers = () => {
                                                                 <div className="col-md-12">
                                                                     <label htmlFor="">Discount amount</label> <br />
                                                                     <div className="position-relative w-50 from-control-offer d-flex align-items-center">
-                                                                        {offerData.offer_value_type === "flat" && <span style={{ fontSize: "15px" }}>₹</span>}<input type="text" name='offer_value' style={{ border: 'none', outline: 'none', width: '100%' }} onChange={(e) => {
+                                                                        {offerData.offer_value_type === "flat" && <span style={{ fontSize: "15px" }}>{userPermission?.currencySymbol}</span>}<input type="text" name='offer_value' style={{ border: 'none', outline: 'none', width: '100%' }} onChange={(e) => {
                                                                             console.log(isNaN(e.target.value))
                                                                             if (!isNaN(e.target.value)) {
                                                                                 offerData.offer_value_type === 'flat' ? updateOfferData(e) : setOfferData({ ...offerData, offer_value: Number(e.target.value) > 100 ? "100" : e.target.value })
@@ -760,7 +762,7 @@ const SuperLeadzCreateOffers = () => {
                                                             <div className="col-4">
                                                                 <label htmlFor="">{offerData.customer_buys === "ITEMS" ? "Quantity" : "Amount"}</label>
                                                                 <div className="position-relative from-control-offer d-flex align-items-center" style={{ height: '38px' }}>
-                                                                    {offerData.customer_buys === "AMT" && <span style={{ fontSize: "15px" }}>₹</span>}<input type="text" name='cart_value' style={{ border: 'none', outline: 'none', width: '100%' }} onChange={(e) => {
+                                                                    {offerData.customer_buys === "AMT" && <span style={{ fontSize: "15px" }}>{userPermission?.currencySymbol}</span>}<input type="text" name='cart_value' style={{ border: 'none', outline: 'none', width: '100%' }} onChange={(e) => {
                                                                         if (!isNaN(e.target.value)) {
                                                                             updateOfferData(e)
                                                                         } else {
@@ -869,7 +871,7 @@ const SuperLeadzCreateOffers = () => {
                                                                             <div className="row">
                                                                                 <div className="col-md-12">
                                                                                     <div className="position-relative w-50 from-control-offer d-flex align-items-center">
-                                                                                        <span style={{ fontSize: "15px" }}>₹</span>
+                                                                                        <span style={{ fontSize: "15px" }}>{userPermission?.currencySymbol}</span>
                                                                                         <input type="text" style={{ border: 'none', outline: 'none', width: '100%' }} name='cart_value' onChange={(e) => {
                                                                                             if (!isNaN(e.target.value)) {
                                                                                                 updateOfferData(e)
@@ -1420,7 +1422,7 @@ const SuperLeadzCreateOffers = () => {
                                                 <ul>
                                                     <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData.method === "product" ? "Discount on Select Products" : offerData.method === "amount" ? "Discount on Total Order Value" : "Buy X get Y"}</li>
                                                     {
-                                                        offerData.offer_value ? <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData.offer_value_type === "percent" ? `${offerData.offer_value}% off` : `₹${offerData.offer_value} off`}</li> : ""
+                                                        offerData.offer_value ? <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData.offer_value_type === "percent" ? `${offerData.offer_value}% off` : `${userPermission?.currencySymbol}${offerData.offer_value} off`}</li> : ""
                                                     }
 
                                                 </ul>
@@ -1519,7 +1521,7 @@ const SuperLeadzCreateOffers = () => {
                                                             }
 
                                                             {
-                                                                offerData.method === "BXBY" ? "" : <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData.cart_condition === "NO_REQ" ? "No conditions" : offerData.cart_condition === "AMT" ? `Purchase ₹${offerData.cart_value} of items in the cart` : `${offerData.cart_value} items in cart `}</li>
+                                                                offerData.method === "BXBY" ? "" : <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData.cart_condition === "NO_REQ" ? "No conditions" : offerData.cart_condition === "AMT" ? `Purchase ${userPermission?.currencySymbol}${offerData.cart_value} of items in the cart` : `${offerData.cart_value} items in cart `}</li>
                                                             }
                                                             {
                                                                 offerData.per_cust_limit ? <li style={{ fontSize: '16px', marginBottom: '8px' }}> Limit to one use per customer</li> : ''

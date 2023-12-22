@@ -13,8 +13,8 @@ import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
 
 const Plan_pricing = () => {
-  const [Razorpay, isLoaded] = useRazorpay()
   const { userPermission } = useContext(PermissionProvider)
+  const [Razorpay, isLoaded] = useRazorpay()
   const [planData, setPlanData] = useState([])
   const [isLoading, setLoading] = useState(true)
   const [userData, setUserData] = useState(userPermission?.multipleDomain.filter((cur) => cur.api_key === userPermission?.apiKey))
@@ -214,7 +214,7 @@ const Plan_pricing = () => {
                           </li>
                           <li className="d-flex gap-1 mb-1 align-items-center">
                             <span className="icon d-flex justify-content-center align-items-center" style={{width: "20px", aspectRatio: "1"}}><CheckCircle size={15} /></span>
-                            <div className="feature">₹0.33 per reach & ₹2 per click</div>
+                            <div className="feature">{userPermission?.currencySymbol}0.33 per reach & {userPermission?.currencySymbol}2 per click</div>
                           </li>
                           <li className="d-flex gap-1 mb-1 align-items-center">
                             <span className="icon d-flex justify-content-center align-items-center" style={{width: "20px", aspectRatio: "1"}}><CheckCircle size={15} /></span>
@@ -263,7 +263,7 @@ const Plan_pricing = () => {
                             <span>for small-scale businesses</span>
                           </div>
                           <div className="plan-type">
-                            <h2>₹{Number(cur.year_plan_price)}</h2>
+                            <h2>{userPermission?.currencySymbol}{Number(cur.year_plan_price)}</h2>
                           </div>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
@@ -276,7 +276,7 @@ const Plan_pricing = () => {
                           </li>
                           <li className="d-flex gap-1 mb-1 align-items-center">
                             <span className="icon d-flex justify-content-center align-items-center" style={{width: "20px", aspectRatio: "1"}}><CheckCircle size={15} /></span>
-                            <div className="feature">₹0.33 per reach & ₹2 per click</div>
+                            <div className="feature">{userPermission?.currencySymbol}0.33 per reach & {userPermission?.currencySymbol}2 per click</div>
                           </li>
                           <li className="d-flex gap-1 mb-1 align-items-center">
                             <span className="icon d-flex justify-content-center align-items-center" style={{width: "20px", aspectRatio: "1"}}><CheckCircle size={15} /></span>

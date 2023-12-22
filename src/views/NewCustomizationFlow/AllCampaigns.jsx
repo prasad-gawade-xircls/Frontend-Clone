@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardBody, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, Row, UncontrolledButtonDropdown, UncontrolledDropdown } from 'reactstrap'
 import toast from 'react-hot-toast'
@@ -10,19 +10,16 @@ import { ThemesProvider } from '../../Helper/Context'
 import { SuperLeadzBaseURL } from '../../assets/auth/jwtService'
 // import { getCurrentOutlet } from '../Validator'
 import Spinner from '../Components/DataTable/Spinner'
-import { Copy, Edit, Edit2, Edit3, Eye, Layout, MoreVertical, Plus, Sliders, Trash, X } from 'react-feather'
-import { getCurrentOutlet, pageNo } from '../Validator'
+import { Copy, Edit, Edit2, Edit3, Eye, Layout, MoreVertical, Plus, Trash, X } from 'react-feather'
+import { getCurrentOutlet } from '../Validator'
 import '@styles/react/libs/flatpickr/flatpickr.scss'
 // import pixels from "../../assets/images/superLeadz/pixels.png"
 import Flatpickr from 'react-flatpickr'
 import CampaignWiseData from '../Components/SuperLeadz/CampaignWiseData'
-import ServerSideTable from '../Components/DataTable/ServerSide'
-import InputField from '../../Helper/inputField'
 
 const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
 
     const [searchValue, setSearchValue] = useState('')
-    console.log("searchValue", searchValue)
     const [filteredData, setFilteredData] = useState([])
 
     const outletData = getCurrentOutlet()
@@ -42,52 +39,6 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
     const [checkedThemes, setCheckedThemes] = useState([])
     const [deleteMode, setDeleteMode] = useState("single")
 
-    //------------------------------------------------------------------------
-    const [isAdvanceFieldsOpen, setIsAdvanceFieldsOpen] = useState(false)
-    const handleSliderClick = () => {
-        setIsAdvanceFieldsOpen(!isAdvanceFieldsOpen)
-    }
-
-    const dataToCheck = [
-        {
-            title: "Campaign Name",
-            name: "campaign_Name",
-            type: "text",
-            id: "campaign_Name",
-            options: ["Option 1", "Option 2", "Option 3"]
-        },
-        {
-            title: "Start Date",
-            name: "start_Date",
-            type: "date",
-            id: "start_Date"
-        },
-        {
-            title: "End Date",
-            name: "end_Date",
-            type: "date",
-            id: "end_Date"
-        }
-    ]
-
-    const [advanceData, setAdvanceData] = useState({
-        campaign_Name: "",
-        start_Date: "",
-        end_Date: ""
-    })
-
-    // const [advanceData, setAdvanceData] = useState({
-    //     campain_Name: "",
-    //     start_Date: "",
-    //     end_Date: ""
-    // })
-
-    const [currentPage, setCurrentPage] = useState(0)
-    const [currentEntry, setCurrentEntry] = useState(10)
-    const [count, setCount] = useState(10)
-
-    //-------------------------------------------------------------------------
-
 
     const [modal1, setModal1] = useState(false)
 
@@ -96,44 +47,17 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
     // const [prevModal, setPrevModal] = useState(false)
 
     const [dateRow, setDateRow] = useState({})
-    // console.log(dateRow)
+    console.log(setDateRow)
 
     const [dates, setDates] = useState({
         start_date: "",
         end_date: ""
     })
 
-    // const updateData = (e) => {
-    //     setAdvanceData({ ...advanceData, [e.target.name]: e.target.value })
-    // }
-    const updateData = (e) => {
-        const { name, value } = e.target
-        setAdvanceData((prevAdvanceData) => ({
-            ...prevAdvanceData,
-            [name]: value
-        }))
-    }
-
-    // const saveInnerXirclsDetails = () => {
-    //     const check = validForm(valueToCheck, dataToCheck)
-    //     console.log(check)
-    // }
-
-    console.log(advanceData)
-    // Object.keys(advanceData).map(key => {
-    //     console.log("key", key)
-    // })
-
     const toggleDateModal = () => setDateModal(!dateModal)
 
     const getAllThemes = () => {
-        const getUrl = new URL(`${SuperLeadzBaseURL}/api/v1/show_all_form_builder_theme/`)
-        getUrl.searchParams.append('shop', outletData[0]?.web_url)
-        getUrl.searchParams.append('app', 'superleadz')
-        Object.entries(advanceData).map(([key, value]) => {
-            getUrl.searchParams.append(key, value)
-        })
-
+        const getUrl = new URL(`${SuperLeadzBaseURL}/api/v1/show_all_form_builder_theme/?shop=${outletData[0]?.web_url}&app=superleadz`)
         axios({
             method: "GET",
             url: getUrl
@@ -141,7 +65,6 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
             const newArr = []
             setAllCampaigns([...data?.data?.success])
             setIsLoading(false)
-            setCount(data?.data?.count)
             data.data.is_active.forEach(ele => {
                 newArr.push(Number(ele))
             })
@@ -153,30 +76,11 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
         })
     }
 
-    // useEffect(() => {
-    //     if (advanceData) {
-    //         const delay = 1000
-    //         const request = setTimeout(() => {
-    //             getAllThemes()
-    //         }, delay)
-
-    //         return () => {
-    //             clearTimeout(request)
-    //         }
-    //     }
-    // }, [advanceData])
-
-
-    // useEffect(() => {
-    //     getAllThemes()
-    // }, [])
-
-
     const deleteThemes = () => {
         const obj = {
             theme_id: deleteMode === "single" ? [currDetails.id] : [...checkedThemes]
         }
-
+        console.log(obj, "obj")
         const form_data = new FormData()
         Object.entries(obj).map(([key, value]) => {
             if (Array.isArray(value)) {
@@ -289,227 +193,206 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
     }
 
     const defferContent = <>
-        <Row>
-            <Col className='d-flex align-items-center' md='4' sm='12'>
-                <div className='d-flex justify-content-start align-items-center gap-2'>
-                    <label>
-                        Show
-                    </label>
-                    <select className='form-control' value={currentEntry} onChange={(e) => {
-                        setCurrentEntry(Number(e.target.value))
-                    }} style={{ appearance: 'auto' }}>
-                        {pageNo.map(page => <option value={page.value}>{page.label}</option>)}
-                    </select>
-
-                </div>
-            </Col>
-            <Col className='d-flex align-items-center' md='4' sm='12'>
-                <h4 className='m-0'>{name}</h4>
-            </Col>
-            <Col className='d-flex align-items-center' md='4' sm='12'>
-                <div className="d-flex gap-2 align-items-center">
-                    <Link to={"/merchant/SuperLeadz/themes/"} className='btn btn-primary-main' style={{ width: "265px" }}> Create Campaign</Link>
-                    <input type="text" className="form-control w-75" value={searchValue} onChange={handleFilter} placeholder='Search...' />
-                    <span onClick={() => handleSliderClick()} className="center toolbar" style={{ padding: 5, fontSize: 18, marginLeft: 5, cursor: 'pointer' }} data-toggle="tooltip" data-placement="bottom" title="Advance Filtering">
-                        <Sliders size={20} strokeWidth={2.5} style={{ transform: 'rotate(-90deg)', fontWeight: 'bold' }} />
-                    </span>
-                </div>
-            </Col>
-        </Row>
-
-        <Col>
-            {isAdvanceFieldsOpen && (
-                <div className="row py-2 advance_filter_row">
-                    <Row>
-                        <InputField dataToCheck={dataToCheck} advanceData={advanceData} updateData={updateData} />
-                    </Row>
-                </div>
-            )}
+        <Col className='d-flex align-items-center justify-content-center' md='4' sm='12'>
+            <h4 className='m-0'>{name}</h4>
+        </Col>
+        <Col className='d-flex align-items-center justify-content-end' md='4' sm='12'>
+            <div className="d-flex gap-2 align-items-center">
+                <Link to={"/merchant/SuperLeadz/themes/"} className='btn btn-primary-main' style={{ width: "240px" }}> Create Campaign</Link>
+                <input type="text" className="form-control w-75" value={searchValue} onChange={handleFilter} placeholder='Search...' />
+            </div>
         </Col>
     </>
 
     const columns = [
+        // {
+        //     name: <div className="p-0 m-0 form-check form-check-success">
+        //         <input type="checkbox" className="form-check-input m-0" onChange={(e) => {
+        //             if (e.target.checked) {
+        //                 const allId = allCampaigns.map((curElem) => {
+        //                     return curElem.id
+        //                 })
+
+        //                 setCheckedThemes(allId)
+        //             } else {
+        //                 setCheckedThemes([])
+        //             }
+        //         }} />
+        //     </div>,
+        //     cell: (row) => <div className="p-0 m-0 form-check form-check-success"><input checked={checkedThemes.includes(row.id)} onChange={e => {
+        //         if (e.target.checked) {
+        //             setCheckedThemes([...checkedThemes, row.id])
+        //         } else {
+        //             setCheckedThemes([...checkedThemes].filter(item => item !== row.id))
+        //         }
+        //     }} type="checkbox" className="form-check-input m-0" /></div>,
+        //     width: "60px"
+        // },
         {
-            name: '',
-            cell: (row) => <div className="p-0 m-0 form-check form-check-success"><input checked={checkedThemes.includes(row.id)} onChange={e => {
-                if (e.target.checked) {
-                    setCheckedThemes([...checkedThemes, row.id])
-                } else {
-                    setCheckedThemes([...checkedThemes].filter(item => item !== row.id))
-                }
-            }} type="checkbox" className="form-check-input m-0" /></div>,
-            width: "50px"
-        },
-        {
-            name: '',
-            cell: (row) => (
-                <div className='d-flex justify-content-start align-items-center gap-1 py-1'>
-                    <div style={{ backgroundImage: `url("https://miro.medium.com/v2/resize:fit:678/1*ZPvzUShTe448VPDukHiskw.png")`, backgroundSize: "100%" }}>
+            name: 'Campaign',
+            selector: row => {
+                return (
+                    <div className='d-flex justify-content-start align-items-center gap-1 py-1'>
+                        <div style={{ backgroundImage: `url("https://miro.medium.com/v2/resize:fit:678/1*ZPvzUShTe448VPDukHiskw.png")`, backgroundSize: "100%" }}>
+                            <div onClick={() => {
+                                setSelectedThemeNo(row.default_id)
+                                setEditTheme(row)
+                                localStorage.setItem("is_draft", row.is_draft)
+                                navigate(`/merchant/SuperLeadz/overview/${row.id}/`)
+                            }} className="prev d-flex justify-content-center align-items-center rounded position-relative overflow-hidden cursor-pointer" style={{ width: "120px", height: "67.5px", backgroundColor: JSON.parse(row.custom_theme).overlayStyles.backgroundColor, backgroundImage: JSON.parse(row.custom_theme).overlayStyles.backgroundImage }}>
+                                <span className="position-absolute">
+                                    <JsonToJsx isMobile={false} renderObj={JSON.parse(row.custom_theme)} scale={0.1125} index={0} />
+                                </span>
+                            </div>
+                        </div>
                         <div onClick={() => {
                             setSelectedThemeNo(row.default_id)
                             setEditTheme(row)
-                            localStorage.setItem("is_draft", row.is_draft)
                             navigate(`/merchant/SuperLeadz/overview/${row.id}/`)
-                        }} className="prev d-flex justify-content-center align-items-center rounded position-relative overflow-hidden cursor-pointer" style={{ width: "120px", height: "67.5px", backgroundColor: JSON.parse(row.custom_theme).overlayStyles.backgroundColor, backgroundImage: JSON.parse(row.custom_theme).overlayStyles.backgroundImage }}>
-
-                            <span className="position-absolute">
-                                <JsonToJsx isMobile={false} renderObj={JSON.parse(row.custom_theme)} scale={0.1125} />
-                            </span>
+                        }} className='fw-bolder text-primary cursor-pointer'>{row.campaign_name}</div>
+                    </div>
+                )
+            }
+        },
+        {
+            name: 'Status',
+            selector: row => {
+                if (row.is_draft === 0) {
+                    return (
+                        <div className="m-auto form-check form-switch form-check-success cursor-pointer p-0 m-0" style={{ filter: `drop-shadow(0px 0px 7.5px rgba(40, 199, 111, ${row.is_active ? "0.5" : "0"}))` }}>
+                            <input onChange={() => {
+                                setCurrDetails(row)
+                                const getUrl = new URL(`${SuperLeadzBaseURL}/api/v1/get/active-template/`)
+                                const form_data = new FormData()
+                                form_data.append("shop", outletData[0]?.web_url)
+                                form_data.append("app", "superleadz")
+                                form_data.append('theme_id', row.id)
+                                form_data.append('campaign_name', row.campaign_name)
+                                axios({
+                                    method: "POST",
+                                    url: getUrl,
+                                    data: form_data
+                                }).then((data) => {
+                                    // data.data.response.forEach(row => {
+                                    //     newArr.push(row.
+                                    // })
+                                    if ((data.data.response.length === 0) || (data.data.response.length > 0 && activeThemes.includes(row.id))) {
+                                        setModal1(true)
+                                    } else {
+                                        setConflictThemes([...data.data.response])
+                                        setConflictModal(true)
+                                    }
+                                }).catch((err) => {
+                                    console.log({ err })
+                                })
+                            }} type='checkbox' checked={activeThemes.includes(row.id)} className='form-check-input cursor-pointer m-0' />
                         </div>
-                    </div>
-                </div>
-            ),
-            width: "180px"
-        },
-
-        {
-            name: '',
-            cell: (row) => (
-                <div className='d-flex flex-column' style={{ gap: "12px" }}>
-                    <div onClick={() => {
-                        setSelectedThemeNo(row.default_id)
-                        setEditTheme(row)
-                        localStorage.setItem("is_draft", row.is_draft)
-                    //     navigate(`/merchant/SuperLeadz/new_customization/${row.id}`, { state: row })
-                    // }} className='fw-bolder text-primary cursor-pointer'>{row.campaign_name}
-                    navigate(`/merchant/SuperLeadz/overview/${row.id}/`)
-                    }} className='fw-bolder text-primary cursor-pointer'>{row.campaign_name}
-
-
-                    </div>
-                    <div className=' d-flex flex-column justify-content-start' >
-
-                        <div className=' d-flex justify-content-start align-items-center' style={{ gap: "7px" }}>
-                            <div>
-                                <span className='cursor-pointer' onClick={() => {
-                                    toggleDateModal()
-                                    setDateRow(row)
-                                    setDates({ ...dates, start_date: row.start_date || "", end_date: row.end_date || "" })
-                                }} style={{ color: "#5e5858" }}>
-                                    <span className='fw-bold' style={{ color: "#000" }} >From </span>
-                                    {moment(row.start_date).format("DD-MM-YYYY")}
-                                </span>
-                            </div>
-                            <div>
-                                <span className='cursor-pointer' onClick={() => {
-                                    toggleDateModal()
-                                    setDateRow(row)
-                                    setDates({ ...dates, start_date: row.start_date || "", end_date: row.end_date || "" })
-                                }} style={{ color: "#5e5858" }}>
-                                    <span className='fw-bold' style={{ color: "#000" }}>To </span>
-                                    {row.end_date ? moment(row.end_date).format("DD-MM-YYYY") : "never ending"}
-                                </span>
-                            </div>
-                            <div>
-                                <span className='cursor-pointer' style={{ color: "#5e5858" }}>
-                                    <span className='fw-bold' style={{ color: "#000" }}>Conversion: </span>
-                                    30.69%
-                                </span>
-                            </div>
-                            <div>
-                                <span className='cursor-pointer' style={{ color: "#5e5858" }}>
-                                    <span className='fw-bold' style={{ color: "#000" }}>Revenue: </span>
-                                    $1,60,000
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
-
+                    )
+                } else {
+                    return (
+                        <div className='text-warning m-auto'>Draft</div>
+                    )
+                }
+            }
+            // new Date(row.created_at).toUTCString().replace("GMT", "")
         },
         {
-            name: "",
-            cell: (row) => (
-                <>
-                    <div>
-                        {
-                            row.is_draft === 0 ? (
-                                <div className="m-auto form-check form-switch form-check-success cursor-pointer p-0 m-0" style={{ filter: `drop-shadow(0px 0px 7.5px rgba(40, 199, 111, ${row.is_active ? "0.5" : "0"}))` }}>
-                                    <input onChange={() => {
-                                        setCurrDetails(row)
-                                        const getUrl = new URL(`${SuperLeadzBaseURL}/api/v1/get/active-template/`)
-                                        const form_data = new FormData()
-                                        form_data.append("shop", outletData[0]?.web_url)
-                                        form_data.append("app", "superleadz")
-                                        form_data.append('theme_id', row.id)
-                                        form_data.append('campaign_name', row.campaign_name)
-                                        axios({
-                                            method: "POST",
-                                            url: getUrl,
-                                            data: form_data
-                                        }).then((data) => {
-
-                                            if ((data.data.response.length === 0) || (data.data.response.length > 0 && activeThemes.includes(row.id))) {
-                                                setModal1(true)
-                                            } else {
-                                                setConflictThemes([...data.data.response])
-                                                setConflictModal(true)
-                                            }
-                                        }).catch((err) => {
-                                            console.log({ err })
-                                        })
-                                    }} type='checkbox' checked={activeThemes.includes(row.id)} className='form-check-input cursor-pointer m-0' />
-                                </div>
-                            ) : (
-                                <div className='text-warning m-auto'>Draft</div>
-                            )
-                        }
-                    </div>
-                </>
-            ),
-            width: "150px"
+            name: 'Start Date',
+            selector: row => <span className='cursor-pointer' onClick={() => {
+                toggleDateModal()
+                setDateRow(row)
+                setDates({ ...dates, start_date: row.start_date || "", end_date: row.end_date || "" })
+            }}>{moment(row.start_date).format("DD-MM-YYYY")}</span>,
+            dataType: 'offer_code'
         },
         {
-            name: '',
+            name: 'End Date',
+            selector: row => <span className='cursor-pointer' onClick={() => {
+                toggleDateModal()
+                setDateRow(row)
+                setDates({ ...dates, start_date: row.start_date || "", end_date: row.end_date || "" })
+            }}>{row.end_date ? moment(row.end_date).format("DD-MM-YYYY") : "perpetual"}</span>
+        },
+        {
+            name: 'Actions',
             cell: row => (
                 <div className="d-flex justify-content-center align-items-center gap-2">
-                    <div onClick={() => {
-                        setDeleteMode("single")
-                        setCurrDetails(row)
-                        setDeleteModal(!deleteModal)
-                    }}>
-                        <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
-                            <Trash stroke='#ea5455' size={"15px"} className='cursor-pointer' />
 
-                        </div>
-                    </div>
-                    <div onClick={() => {
-                        sendDuplicate(row)
-                    }} >
-                        <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
-                            <Copy stroke='#28c76f' size={"15px"} className='cursor-pointer' />
+                    {/* <button className="btn btn-info" onClick={e => {
+                    e.preventDefault()
+                    const url = new URL(`${SuperLeadzBaseURL}/api/v1/pop_up_analytics/?shop=${outletData[0]?.web_url}&app=superleadz&theme_id=${row.id}`)
+                    axios({
+                        method: "GET",
+                        url
+                    })
+                    .then((data) => {
+                        console.log(data)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+                }}>Check</button> */}
+                    <UncontrolledButtonDropdown className='more-options-dropdown'>
+                        <DropdownToggle className={`btn-icon cursor-pointer`} color='transparent' size='sm'>
+                            <span className={`border-none`}>
+                                <MoreVertical size={15} />
+                            </span>
+                        </DropdownToggle>
+                        <DropdownMenu className='border dropdown-menu-custom'>
+                            {!activeThemes.includes(row.id) && <DropdownItem onClick={() => {
+                                setDeleteMode("single")
+                                setCurrDetails(row)
+                                setDeleteModal(!deleteModal)
+                            }} className='w-100'>
+                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                    <Trash stroke='#ea5455' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Delete</span>
+                                </div>
+                            </DropdownItem>}
+                            <DropdownItem onClick={() => {
+                                sendDuplicate(row)
+                            }} className='w-100'>
+                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                    <Copy stroke='#28c76f' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Duplicate</span>
+                                </div>
+                            </DropdownItem>
+                            <DropdownItem onClick={() => {
+                                setSelectedThemeNo(row.default_id)
+                                setEditTheme(row)
+                                localStorage.setItem("is_draft", row.is_draft)
+                                navigate(`/merchant/SuperLeadz/new_customization/${row.id}`, { state: row })
+                            }} className='w-100'>
+                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                    <Edit2 stroke='#ff9f43' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Edit</span>
+                                </div>
+                            </DropdownItem>
+                            <DropdownItem onClick={() => {
+                                navigate(`/merchant/SuperLeadz/preview/${row.id}/`, { state: row })
+                            }} className='w-100'>
+                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                    <Layout stroke='#ff9f43' size={"15px"} className='cursor-pointer' />
+                                    <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Preview</span>
+                                </div>
+                            </DropdownItem>
 
-                        </div>
-                    </div>
-                    <div onClick={() => {
-                        setSelectedThemeNo(row.default_id)
-                        setEditTheme(row)
-                        localStorage.setItem("is_draft", row.is_draft)
-                        navigate(`/merchant/SuperLeadz/new_customization/${row.id}`, { state: row })
-                    }}>
-                        <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
-                            <Edit2 stroke='#ff9f43' size={"15px"} className='cursor-pointer' />
-
-                        </div>
-                    </div>
-                    <div onClick={() => {
-                        navigate(`/merchant/SuperLeadz/preview/${row.id}/`, { state: row })
-                    }}>
-                        <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
-                            <Layout stroke='#ff9f43' size={"15px"} className='cursor-pointer' />
-
-                        </div>
-                    </div>
+                            {/* <DropdownItem onClick={() => {
+                                setDateRow(row)
+                                setPrevModal(!prevModal)
+                            }} className='w-100'>
+                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                    <Eye stroke='#006aff' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Preview</span>
+                                </div>
+                            </DropdownItem> */}
+                        </DropdownMenu>
+                    </UncontrolledButtonDropdown>
                 </div>
             ),
-            width: "250px"
+            width: "100px"
         }
     ]
 
-    // useEffect(() => {
-    // getAllThemes()
-    // }, [])
+    useEffect(() => {
+        getAllThemes()
+    }, [])
 
     const ExpandedData = (data) => {
         console.log(data)
@@ -517,18 +400,160 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
 
     }
 
+    const deleteContent = <button onClick={() => {
+        setDeleteMode("multiple")
+        setDeleteModal(!deleteModal)
+    }} className="btn btn-danger d-block">Deleting {checkedThemes.length} items</button>
+
     return (
         <>
             <style>
                 {`
- 
+            
                     .dropdown-menu[data-popper-placement]:not([data-popper-placement^="top-"]) {
-                        top: 40px !important
+                        top: 40px !important;
                     }
                 `}
             </style>
 
-            <ServerSideTable
+            {/* <Container fluid className='px-0 d-none'>
+                <Row className='py-2 align-items-center border-bottom'>
+                    <Col className='fw-bold text-black fs-5' xs={5}>
+                        Campaign
+                    </Col>
+                    <Col className=' fw-bold text-black fs-5' xs={2}>
+                        Status
+                    </Col>
+                    <Col className=' fw-bold text-black fs-5' xs={2}>
+                        Start Date
+                    </Col>
+                    <Col className=' fw-bold text-black fs-5' xs={2}>
+                        End Date
+                    </Col>
+                    <Col className=' fw-bold text-black fs-5 text-center' xs={1}>
+                        Action
+                    </Col>
+                </Row>
+                {!isLoading ? allCampaigns.map((ele, key) => {
+                    return (
+                        <Row className='py-2 align-items-center border-bottom' key={key}>
+                            <Col className='d-flex justify-content-start align-items-center gap-1' xs={5}>
+                                <div style={{ backgroundImage: `url("https://miro.medium.com/v2/resize:fit:678/1*ZPvzUShTe448VPDukHiskw.png")`, backgroundSize: "100%" }}>
+                                    <div onClick={() => {
+                                        setSelectedThemeNo(ele.default_id)
+                                        setEditTheme(ele)
+                                        navigate(`/merchant/SuperLeadz/new_customization/${ele.id}`, { state: ele })
+                                    }} to={"/merchant/SuperLeadz/new_customization/"} className="prev d-flex justify-content-center align-items-center rounded position-relative overflow-hidden cursor-pointer" style={{ width: "120px", height: "67.5px", backgroundColor: JSON.parse(ele.custom_theme).overlayStyles.backgroundColor, backgroundImage: JSON.parse(ele.custom_theme).overlayStyles.backgroundImage }}>
+                                        <span className="position-absolute">
+                                            <JsonToJsx isMobile={false} renderObj={JSON.parse(ele.custom_theme)} scale={0.1125} />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div onClick={() => {
+                                    setSelectedThemeNo(ele.default_id)
+                                    setEditTheme(ele)
+                                    navigate(`/merchant/SuperLeadz/new_customization/${ele.id}`, { state: ele })
+                                }} className='fw-bolder text-primary cursor-pointer'>{ele.campaign_name}</div>
+                            </Col>
+                            <Col className='' xs={2}>
+                                {ele.is_draft === 0 ? (
+                                    <span className="form-check form-switch form-check-success cursor-pointer p-0 m-0" style={{ filter: `drop-shadow(0px 0px 7.5px rgba(40, 199, 111, ${ele.is_active ? "0.5" : "0"}))` }}>
+                                        <input onChange={() => {
+                                            setCurrDetails(ele)
+                                            const getUrl = new URL(`${SuperLeadzBaseURL}/api/v1/get/active-template/`)
+                                            const form_data = new FormData()
+                                            form_data.append("shop", outletData[0]?.web_url)
+                                            form_data.append("app", "superleadz")
+                                            form_data.append('theme_id', ele.id)
+                                            form_data.append('campaign_name', ele.campaign_name)
+                                            axios({
+                                                method: "POST",
+                                                url: getUrl,
+                                                data: form_data
+                                            }).then((data) => {
+                                                if ((data.data.response.length === 0) || (data.data.response.length > 0 && activeThemes.includes(ele.id))) {
+                                                    setModal1(true)
+                                                } else {
+                                                    setConflictThemes([...data.data.response])
+                                                    setConflictModal(true)
+                                                }
+                                            }).catch((err) => {
+                                                console.log({ err })
+                                            })
+                                        }} type='checkbox' checked={activeThemes.includes(ele.id)} className='form-check-input cursor-pointer m-0' />
+                                    </span>
+                                ) : (
+                                    <span className='text-warning'>Draft</span>
+                                )}
+                            </Col>
+                            <Col className='' xs={2}>
+                                {moment(ele.start_date).format("DD-MM-YYYY")}
+                            </Col>
+                            <Col className='' xs={2}>
+                                {ele.end_date ? moment(ele.end_date).format("DD-MM-YYYY") : "never ending"}
+                            </Col>
+                            <Col className='' xs={1}>
+                                <div className="d-flex justify-content-center align-items-center gap-2">
+                                    <UncontrolledDropdown className='more-options-dropdown'>
+                                        <DropdownToggle className={`btn-icon cursor-pointer`} color='transparent' size='sm'>
+                                            <span className={`border-none`}>
+                                                <MoreVertical size={15} />
+                                            </span>
+                                        </DropdownToggle>
+                                        <DropdownMenu className='border'>
+                                            <DropdownItem onClick={() => {
+                                                setCurrDetails(ele)
+                                                setDeleteModal(!deleteModal)
+                                            }} className='w-100'>
+                                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                                    <Trash stroke='#ea5455' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Delete</span>
+                                                </div>
+                                            </DropdownItem>
+                                            <DropdownItem onClick={() => {
+                                                sendDuplicate(ele)
+                                            }} className='w-100'>
+                                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                                    <Copy stroke='#28c76f' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Duplicate</span>
+                                                </div>
+                                            </DropdownItem>
+                                            <DropdownItem onClick={() => {
+                                                setSelectedThemeNo(ele.default_id)
+                                                setEditTheme(ele)
+                                                navigate(`/merchant/SuperLeadz/new_customization/${ele.id}&&${ele.campaign_name}`, { state: ele })
+                                            }} className='w-100'>
+                                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                                    <Edit2 stroke='#ff9f43' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Edit</span>
+                                                </div>
+                                            </DropdownItem>
+                                            <DropdownItem onClick={() => {
+                                                setSelectedThemeNo(ele.default_id)
+                                                setEditTheme(ele)
+                                                navigate(`/merchant/SuperLeadz/new_customization/${ele.id}&&${ele.campaign_name}`, { state: ele })
+                                            }} className='w-100'>
+                                                <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
+                                                    <Eye stroke='#ff9f43' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Preview</span>
+                                                </div>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
+                                </div>
+                            </Col>
+                        </Row>
+                    )
+                }) : (
+                    <div className='d-flex justify-content-center mt-2'>
+                        <Spinner size={'35px'} />
+                    </div>
+                )}
+            </Container> */}
+            {/* <div className="d-flex justify-content-between my-2">
+                <h4>All Campaigns</h4>
+                <div className="d-flex gap-2 align-items-center">
+                    <input type="text" className="form-control" value={searchValue} onChange={handleFilter} />
+                    <Link to={"/merchant/SuperLeadz/themes/"} className='btn btn-primary'>New Campaign</Link>
+                </div>
+            </div> */}
+            <ComTable
                 tableName=""
                 content={defferContent}
                 tableCol={columns}
@@ -540,19 +565,13 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
                 isExpand={true}
                 ExpandableTable={ExpandedData}
                 viewAll={viewAll}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                currentEntry={currentEntry}
-                count={count}
-                isStyling={true}
-                getAllThemes={getAllThemes}
-                advanceData={advanceData}
+                selectableRows={true}
+                selectedRows={checkedThemes}
+                setSelectedRows={setCheckedThemes}
+                deleteContent={deleteContent}
             />
 
-            {checkedThemes.length > 0 && <button onClick={() => {
-                setDeleteMode("multiple")
-                setDeleteModal(!deleteModal)
-            }} className="position-fixed btn btn-danger d-block m-auto" style={{ inset: "auto 50% 10px auto", transform: "translateX(50%)" }}>Delete selection</button>}
+            {/* {checkedThemes.length > 0 && } */}
             <Modal isOpen={modal1} toggle={() => setModal1(!modal1)} className='position-relative popup-cust' >
                 <ModalBody>
                     <span className="position-absolute top-0 end-0" style={{ cursor: 'pointer', padding: "0.25rem" }} onClick={() => setModal1(!modal1)}>
@@ -612,6 +631,14 @@ const AllCampaigns = ({ custom = false, viewAll, name = "All Campaigns" }) => {
                     </div>
                 </ModalBody>
             </Modal>
+            {/* <Modal size='xl' isOpen={prevModal} toggle={() => setPrevModal(!prevModal)}>
+                <ModalBody>
+                    <span className="position-absolute top-0 end-0" style={{ cursor: 'pointer', padding: "0.25rem" }} onClick={() => setPrevModal(!prevModal)}>
+                        <X size={17.5} />
+                    </span>
+                    {prevModal && <JsonToJsx renderObj={JSON.parse(dateRow.custom_theme)} scale={1} />}
+                </ModalBody>
+            </Modal> */}
         </>
     )
 }

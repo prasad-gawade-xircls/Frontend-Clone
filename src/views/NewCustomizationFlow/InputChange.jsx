@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link2 } from 'react-feather'
 
-const InputChange = ({ parentType, setMainStyle, mainStyle, mobileCondition, allValues, setAllValues, type, hideLabel, getMDToggle }) => {
+const InputChange = ({ parentType, setMainStyle, mainStyle, mobileCondition, allValues, setAllValues, type, hideLabel }) => {
   const [linked, setLinked] = useState(false)
   const [lastValue, setLastValue] = useState("")
 
@@ -49,7 +49,7 @@ const InputChange = ({ parentType, setMainStyle, mainStyle, mobileCondition, all
         {!hideLabel && <label className='text-capitalize' style={{ marginBottom: '0.3rem' }}>{type}</label>}
         <div style={{ aspectRatio: '1', gridTemplateColumns: '1fr 1fr 1fr', display: 'grid' }}>
           <div></div>
-          <div className="text-center">
+          <div className="d-flex justify-content-center align-items-center">
             <input
               type="number"
               name={"Top"}
@@ -65,10 +65,10 @@ const InputChange = ({ parentType, setMainStyle, mainStyle, mobileCondition, all
               }}
               value={allValues[`${type}Top`] ? allValues[`${type}Top`].split("px")[0] : "0px"}
             />
-            {getMDToggle({label: "Top", value: `${type}Top`})}
+            {/* {getMDToggle({label: "Top", value: `${type}Top`})} */}
           </div>
           <div></div>
-          <div className="text-center">
+          <div className="d-flex justify-content-center align-items-center">
             <input
               type="number"
               name={"Left"}
@@ -83,12 +83,13 @@ const InputChange = ({ parentType, setMainStyle, mainStyle, mobileCondition, all
                 }
               }}
             />
-            {getMDToggle({label: "Left", value: `${type}Left`})}
+            {/* {getMDToggle({label: "Left", value: `${type}Left`})} */}
           </div>
-          <div onClick={() => setLinked(!linked)} className="d-flex justify-content-center align-items-center">
-            <Link2 size={18} strokeWidth={2.5} style={{ transform: 'rotate(-45deg)', color: linked ? '#7367f0' : '' }} />
+          <div onClick={() => setLinked(!linked)} className={`d-flex justify-content-center align-items-center cursor-pointer p-1`}>
+            <span className={`text-center  ${linked ? 'bg-dark text-white' : 'text-dark bg-white'} p-1 rounded`} style={{fontSize: "12px"}}>Appl{linked ? "ied" : "y"} to all sides</span>
+            {/* <Link2 size={18} strokeWidth={2.5} style={{ transform: 'rotate(-45deg)', color: linked ? '#7367f0' : '' }} /> */}
           </div>
-          <div className="text-center">
+          <div className="d-flex justify-content-center align-items-center">
             <input
               type="number"
               name={"Right"}
@@ -103,10 +104,10 @@ const InputChange = ({ parentType, setMainStyle, mainStyle, mobileCondition, all
                 }
               }}
             />
-            {getMDToggle({label: "Right", value: `${type}Right`})}
+            {/* {getMDToggle({label: "Right", value: `${type}Right`})} */}
           </div>
           <div></div>
-          <div className="text-center">
+          <div className="d-flex justify-content-center align-items-center">
             <input
               type="number"
               name={"Bottom"}
@@ -121,7 +122,7 @@ const InputChange = ({ parentType, setMainStyle, mainStyle, mobileCondition, all
                 }
               }}
             />
-            {getMDToggle({label: "Bottom", value: `${type}Bottom`})}
+            {/* {getMDToggle({label: "Bottom", value: `${type}Bottom`})} */}
           </div>
           <div></div>
         </div>

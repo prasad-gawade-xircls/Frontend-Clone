@@ -83,6 +83,8 @@ const FlowSignUp = () => {
         confirm_password: "",
         app: params.get('app'),
         website: params.get('shop'),
+        currency: params.get('currency'),
+        shopify_xircls_app_id: params.get('shopify_xircls_app_id'),
         termsAndCondition: false,
         checkPassword: true,
         checkShop: true,

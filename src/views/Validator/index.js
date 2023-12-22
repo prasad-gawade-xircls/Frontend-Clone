@@ -118,7 +118,7 @@ export function validForm(validator, value) {
                 $(`#${currentObject.id}_val`).html(currentObject.message)
                 $(`input[name="${currentObject.id}"]`).focus()
                 isValid = false
-                break 
+                break
             } else {
                 $(`#${currentObject.id}_val`).html('')
                 // console.log('Some fields are empty')
@@ -163,7 +163,8 @@ export const dashboardURL = {
     infiniti: "/merchant/dashboard/",
     superleadz: "/merchant/SuperLeadz/",
     referral: "/merchant/Referral/",
-    flash_accounts: "/merchant/Flash-Account/"
+    flash_accounts: "/merchant/Flash_Account/",
+    product_review: "/merchant/product-review/"
 }
 
 export function generateRandomString() {

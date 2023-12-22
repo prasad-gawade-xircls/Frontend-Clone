@@ -34,6 +34,7 @@ import AllCampaigns from '../NewCustomizationFlow/AllCampaigns'
 import { PermissionProvider } from '../../Helper/Context'
 
 function SuperLeadzDashboard() {
+    const { userPermission } = useContext(PermissionProvider)
     const [performanceData, setPerformanceData] = useState()
     // const [showData, setShowData] = useState([])
     const [total, setTotal] = useState(0)
@@ -44,7 +45,6 @@ function SuperLeadzDashboard() {
     const [chargesLoader, setChargesLoader] = useState(true)
     const [toLoadCampaign, setToLoadCampaign] = useState(false)
     const [cancel, setCancel] = useState(false)
-    const { userPermission } = useContext(PermissionProvider)
 
     const navigate = useNavigate()
 
@@ -338,7 +338,7 @@ function SuperLeadzDashboard() {
                                         <img src={mainLogo} height={64} width={64} style={{borderRadius:"100%", border:"solid 1px #afafaf"}}/>
                                     </div>
                                     <div className="text-center text-sm-start">
-                                        <h3 className='text-black'>Hey, {outletData[0]?.outlet_name}! Need a sidekick?</h3>
+                                        <h3 className='text-black'>Hey, {userPermission?.currencySymbol_name}! Need a sidekick?</h3>
                                         <h6 className='SmallTxt'>Our team will help you set up your campaign for out-of-this-world results!</h6>
                                         <div className='mt-2 d-flex justify-content-start gap-1'>
                                             <Link to='/merchant/SuperLeadz/' className='shedule_btn btn btn-sm btn-primary btnCustom text-nowrap' style={{width:"140px"}}>

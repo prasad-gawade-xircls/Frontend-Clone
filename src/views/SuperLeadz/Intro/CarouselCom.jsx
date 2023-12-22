@@ -88,7 +88,6 @@ const CarouselCom = ({ setThemeNumber, btn_height, custModal, allThemes }) => {
                                                 }}>
 
                                                     <div className='d-flex justify-content-center align-items-center mx-1 mt-1 ' style={{ background: "#f2f2f2", height: "400px" }}>
-                                                        {/* <img src={theme.imagePrev} alt="theme" width={300} /> */}
                                                         <JsonToJsx renderObj={theme.object} isMobile={false} scale={0.8} />
                                                     </div>
 

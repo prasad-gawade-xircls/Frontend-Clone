@@ -31,9 +31,9 @@ function Placeholder() {
   return <div className="editor-placeholder">Enter text...</div>
 }
 
-export default function Editor({ htmlContent, onChange: onChangeText, hideToolbar, style, editorState, elementId }) {
-  
-  console.log({editorState}, "editorState")
+export default function Editor({fontFamilies = "Montserrat", fontColor = "#444", htmlContent, onChange: onChangeText, hideToolbar, style, editorState, elementId }) {
+
+  // console.log(fontFamilies, "fontFamilies")
   const editorConfig = Object.freeze({
     // The editor theme
     theme: {
@@ -159,12 +159,12 @@ export default function Editor({ htmlContent, onChange: onChangeText, hideToolba
     <LexicalComposer initialConfig={editorConfig}>
       <div className={`editor-container editor_here position-relative ${generateRandomString()}`}>
       {toolbarReady && elementId ? createPortal(
-            <div className="editor_here" style={{position: "fixed", width: "500px", top: toolbarPosition("top"), left: toolbarPosition("left"), transform: !hideToolbar ? "translateY(-150%) translateX(-50%)" : "translateY(-200%) translateX(-50%)", visibility: !hideToolbar ? "visible" : "hidden", opacity: !hideToolbar ? "1" : "0", transition: "0.5s ease", zIndex: "99999999" }}>
-              <ToolbarPlugin />
-            </div>
+            <div className="editor_here" style={{ position: "fixed", width: "500px", top: toolbarPosition("top"), left: toolbarPosition("left"), transform: !hideToolbar ? "translateY(-150%) translateX(-50%)" : "translateY(-200%) translateX(-50%)", visibility: !hideToolbar ? "visible" : "hidden", opacity: !hideToolbar ? "1" : "0", transition: "0.5s ease", zIndex: "99999999" }}>
+          <ToolbarPlugin fontFamilies={fontFamilies} mainFontColor={fontColor} />
+        </div>
             , document.getElementById('preview-section-only')
           ) : null}
-        <div className="editor-inner" style={{ ...style, width: "100%", display: "block"}}>
+        <div className="editor-inner" style={{ ...style, width: "100%", display: "block" }}>
           <RichTextPlugin
             contentEditable={<ContentEditable className="editor-input" />}
             placeholder={<Placeholder />}

@@ -1,5 +1,7 @@
 import { Circle, Home } from "react-feather"
 import { ownUrl } from "../../views/Validator"
+import { AiFillPhone } from "react-icons/ai"
+import { BiDollar } from "react-icons/bi"
 
 export const flashAccountsNavigation = [
     {
@@ -21,18 +23,36 @@ export const flashAccountsNavigation = [
         id: 'dashboard',
         title: 'Dashboard',
         icon: <Circle size={16} />,
-        navLink: '/merchant/Flash-Account/'
+        navLink: '/merchant/Flash_Account/'
     },
     {
         id: 'registered_customer',
-        title: 'Registered Customers',
+        title: 'Customers',
         icon: <Circle size={16} />,
-        navLink: '/merchant/Flash-Account/table/'
+        navLink: '/merchant/Flash_Account/table/'
     },
+    // {
+    //     id: 'setup',
+    //     title: 'Setup',
+    //     icon: <Circle size={16} />,
+    //     navLink: '/merchant/Flash_Account/form/'
+    // },
     {
-        id: 'settings',
+        id: 'setting',
         title: 'Settings',
         icon: <Circle size={16} />,
-        navLink: '/merchant/Flash-Account/form/'
+        navLink: '/merchant/Flash_Account/settings/'
+    },
+    {
+        id: 'billing',
+        title: 'Billing',
+        icon: <BiDollar size={16} />,
+        navLink: '/merchant/Flash_Account/billing/'
+    },
+    {
+        id: 'support',
+        title: 'Support',
+        icon: <AiFillPhone size={16} />,
+        navLink: '/merchant/support/'
     }
 ]

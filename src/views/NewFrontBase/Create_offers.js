@@ -16,6 +16,7 @@ import { PermissionProvider } from '../../Helper/Context'
 import downloadFile from "../../assets/files/offer_code.csv"
 
 const Create_offers = () => {
+    const { userPermission } = useContext(PermissionProvider)
     const { offerId } = useParams()
     const location = useLocation()
     const params = new URLSearchParams(location.search)
@@ -66,8 +67,6 @@ const Create_offers = () => {
         typeOffApply: "collections",
         tnc: ""
     }
-
-    const { userPermission } = useContext(PermissionProvider)
 
     const campaignData = userPermission?.multipleDomain?.filter((cur) => cur.api_key === userPermission?.apiKey)
 
@@ -928,7 +927,7 @@ const Create_offers = () => {
                                                                     }
                                                                 }} value={offerData?.offer_value} />
 
-                                                                {offerData?.offer_value_type === 'flat' ? <span className='position-absolute top-50 start-0 translate-middle-y ms-1'>₹</span> : <span className='position-absolute top-50 end-50 translate-middle-y me-1'>%</span>}
+                                                                {offerData?.offer_value_type === 'flat' ? <span className='position-absolute top-50 start-0 translate-middle-y ms-1'>{userPermission?.currencySymbol}</span> : <span className='position-absolute top-50 end-50 translate-middle-y me-1'>%</span>}
 
                                                             </div>
                                                             <p id="offer_value_val" className="text-danger m-0 p-0 vaildMessage"></p>
@@ -1144,7 +1143,7 @@ const Create_offers = () => {
                                                 <div className="row mt-1">
                                                     <div className="col-4">
                                                         <label htmlFor="">{offerData?.customer_buys === "ITEMS" ? "Quantity" : "Amount"}</label>
-                                                        <input type="text" className="w-100 from-control-offer" name='cart_value' onChange={(e) => updateOfferData(e)} value={offerData?.cart_value} placeholder={offerData?.customer_buys === "ITEMS" ? "0" : "₹ 0.00"} />
+                                                        <input type="text" className="w-100 from-control-offer" name='cart_value' onChange={(e) => updateOfferData(e)} value={offerData?.cart_value} placeholder={offerData?.customer_buys === "ITEMS" ? "0" : `${userPermission?.currencySymbol} 0.00`} />
                                                         <p id="cart_value_val" className="text-danger m-0 p-0 vaildMessage"></p>
 
                                                     </div>
@@ -1243,7 +1242,7 @@ const Create_offers = () => {
                                                                 <div className="input_div mt-1" style={{ marginLeft: '20px' }}>
                                                                     <div className="row">
                                                                         <div className="col-md-12">
-                                                                            <input type="text" placeholder='₹ 0.00' className="w-50 from-control-offer" name='cart_value' onChange={(e) => {
+                                                                            <input type="text" placeholder={`${userPermission?.currencySymbol} 0.00`} className="w-50 from-control-offer" name='cart_value' onChange={(e) => {
                                                                                 if (!isNaN(e.target.value)) {
                                                                                     updateOfferData(e)
                                                                                 }
@@ -1793,7 +1792,7 @@ const Create_offers = () => {
                                         <ul>
                                             <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData?.method === "product" ? "Discount on Select Products" : offerData?.method === "amount" ? "Discount on Total Order Value" : "Buy X get Y"}</li>
                                             {
-                                                offerData?.offer_value ? <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData?.offer_value_type === "percent" ? `${offerData?.offer_value}% off` : `₹${offerData?.offer_value} off`}</li> : ""
+                                                offerData?.offer_value ? <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData?.offer_value_type === "percent" ? `${offerData?.offer_value}% off` : `${userPermission?.currencySymbol}${offerData?.offer_value} off`}</li> : ""
                                             }
 
                                         </ul>
@@ -1910,7 +1909,7 @@ const Create_offers = () => {
                                             }
 
                                             {
-                                                offerData?.method === "BXBY" ? "" : <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData?.cart_condition === "NO_REQ" ? "No conditions" : offerData?.cart_condition === "AMT" ? `Purchase ₹${offerData?.cart_value} of items in the cart` : `${offerData?.cart_value} items in cart `}</li>
+                                                offerData?.method === "BXBY" ? "" : <li style={{ fontSize: '16px', marginBottom: '8px' }}>{offerData?.cart_condition === "NO_REQ" ? "No conditions" : offerData?.cart_condition === "AMT" ? `Purchase ${userPermission?.currencySymbol}${offerData?.cart_value} of items in the cart` : `${offerData?.cart_value} items in cart `}</li>
                                             }
                                             {
                                                 offerData?.per_cust_limit ? <li style={{ fontSize: '16px', marginBottom: '8px' }}> Limit to one use per customer</li> : ''

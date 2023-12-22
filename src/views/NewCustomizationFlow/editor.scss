@@ -343,17 +343,12 @@
       margin-bottom: 1px;
       background: #fff;
       padding: 4px;
-      // border-top-left-radius: 5px;
-      // border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
       vertical-align: middle;
       flex-wrap: wrap;
       border: 1px solid #ccc;
       margin-bottom: 0px;
-      width: 590px;
-      border-radius: 8px;
-      gap: 10px;
-      justify-content: center;
-
     }
     
     .toolbar button.toolbar-item {
@@ -390,7 +385,7 @@
     }
     
     .toolbar button.toolbar-item.active {
-      background-color: rgba(51, 91, 172, 0.3);
+      background-color: rgba(223, 232, 250, 0.3);
     }
     
     .toolbar button.toolbar-item.active i {
@@ -473,21 +468,11 @@
       background-color: transparent;
       background-size: contain;
       display: inline-block;
-      height: 5px;
-      width: 5px;
+      height: 8px;
+      width: 8px;
       background-image: url(./images/chevron-down.svg);
     }
-
-    i.indicator {
-      height: 5px;
-      width: 5px;
-      background-image: url(./images/indicator.svg);
-    }
     
-    i.chevron-dots{
-      background-image: url(./images/chevron-dots.svg);
-    }
-
     #block-controls button:hover {
       background-color: #efefef;
     }
@@ -766,10 +751,6 @@
     
     i.link {
       background-image: url(./images/link.svg);
-    }
-
-    i.indicator {
-      background-image: url(./images/indicator.svg);
     }
     
     i.left-align {

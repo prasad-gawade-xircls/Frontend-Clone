@@ -14,27 +14,27 @@ const ProductView = () => {
         const value = e.target.value
         let updatedData = []
         setSearchValue(value)
-    
-        if (value.length) {
-          updatedData = data.filter(item => {
-            const startsWith =
-              item.title.toLowerCase().startsWith(value.toLowerCase()) ||
-              item.vendor.toLowerCase().startsWith(value.toLowerCase()) ||
-              item.product_type.toLowerCase().startsWith(value.toLowerCase())
-    
-            const includes =
-              item.title.toLowerCase().includes(value.toLowerCase()) ||
-              item.vendor.toLowerCase().includes(value.toLowerCase()) ||
-              item.product_type.toLowerCase().includes(value.toLowerCase())
 
-            if (startsWith) {
-              return startsWith
-            } else if (!startsWith && includes) {
-              return includes
-            } else return null
-          })
-          setFilteredData(updatedData)
-          setSearchValue(value)
+        if (value.length) {
+            updatedData = data.filter(item => {
+                const startsWith =
+                    item.title.toLowerCase().startsWith(value.toLowerCase()) ||
+                    item.vendor.toLowerCase().startsWith(value.toLowerCase()) ||
+                    item.product_type.toLowerCase().startsWith(value.toLowerCase())
+
+                const includes =
+                    item.title.toLowerCase().includes(value.toLowerCase()) ||
+                    item.vendor.toLowerCase().includes(value.toLowerCase()) ||
+                    item.product_type.toLowerCase().includes(value.toLowerCase())
+
+                if (startsWith) {
+                    return startsWith
+                } else if (!startsWith && includes) {
+                    return includes
+                } else return null
+            })
+            setFilteredData(updatedData)
+            setSearchValue(value)
         }
     }
 
@@ -65,23 +65,23 @@ const ProductView = () => {
                         {
                             row.status === "active" ? <span
                                 style={{
-                                backgroundColor: "RGBA(25,135,84,var(--bs-bg-opacity,1)) !important"
+                                    backgroundColor: "RGBA(25,135,84,var(--bs-bg-opacity,1)) !important"
                                 }}
                                 className="badge badge-light-success"
                             >
                                 Active
                             </span> : <span
                                 style={{
-                                backgroundColor: "RGBA(25,135,84,var(--bs-bg-opacity,1)) !important"
+                                    backgroundColor: "RGBA(25,135,84,var(--bs-bg-opacity,1)) !important"
                                 }}
                                 className="badge badge-light-danger"
                             >
                                 Inactive
                             </span>
                         }
-                    
+
                     </>
-                    
+
                 )
             }
         },
@@ -97,14 +97,14 @@ const ProductView = () => {
 
     const getData = () => {
         getReq('productDetails')
-        .then((resp) => {
-            setdata(resp.data.data.product_details.Product_Details.products)
-            setIsLoading(false)
-        })
-        .catch((error) => {
-            console.log(error)
-            setIsLoading(false)
-        })
+            .then((resp) => {
+                setdata(resp.data.data.product_details.Product_Details.products)
+                setIsLoading(false)
+            })
+            .catch((error) => {
+                console.log(error)
+                setIsLoading(false)
+            })
     }
 
     useEffect(() => {
@@ -113,50 +113,50 @@ const ProductView = () => {
     }, [])
 
     const defferContent = <>
-      <Col className='d-flex align-items-center justify-content-center' md='4' sm='12'>
-        <h4 className='m-0'>Products</h4>
-      </Col>
-      <Col className='d-flex align-items-center justify-content-end' md='4' sm='12'>
-        <Input
-          className='dataTable-filter form-control ms-1'
-          style={{ width: `180px`, height: `2.714rem` }}
-          type='text'
-          bsSize='sm'
-          id='search-input-1'
-          placeholder='Search...'
-          value={searchValue}
-          onChange={handleFilter}
-        />
-      </Col>
+        <Col className='d-flex align-items-center justify-content-center' md='4' sm='12'>
+            <h4 className='m-0'>Products</h4>
+        </Col>
+        <Col className='d-flex align-items-center justify-content-end' md='4' sm='12'>
+            <Input
+                className='dataTable-filter form-control ms-1'
+                style={{ width: `180px`, height: `2.714rem` }}
+                type='text'
+                bsSize='sm'
+                id='search-input-1'
+                placeholder='Search...'
+                value={searchValue}
+                onChange={handleFilter}
+            />
+        </Col>
     </>
 
-  return (
-    <Row>
-        <Col md='12'>
-            <Card>
-                <CardBody>
-                    <h4>Products</h4>
-                </CardBody>
-            </Card>
-        </Col>
-        <Col md='12'>
-            <Card>
-                <CardBody>
-                    <ComTable
-                        content={defferContent}
-                        // tableName="Products"
-                        tableCol={columns}
-                        data={data}
-                        searchValue={searchValue}
-                        // handleFilter={handleFilter}
-                        filteredData={filteredData}
-                        isLoading={isLoading}
-                    />
-                </CardBody>
-            </Card>
-        </Col>
-    </Row>
-  )
+    return (
+        <Row>
+            <Col md='12'>
+                <Card>
+                    <CardBody>
+                        <h4>Products</h4>
+                    </CardBody>
+                </Card>
+            </Col>
+            <Col md='12'>
+                <Card>
+                    <CardBody>
+                        <ComTable
+                            content={defferContent}
+                            // tableName="Products"
+                            tableCol={columns}
+                            data={data}
+                            searchValue={searchValue}
+                            // handleFilter={handleFilter}
+                            filteredData={filteredData}
+                            isLoading={isLoading}
+                        />
+                    </CardBody>
+                </Card>
+            </Col>
+        </Row>
+    )
 }
 
 export default ProductView

@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Row } from 'reactstrap'
 import CardCom from '../../Components/SuperLeadz/CardCom'
 import Spinner from '../../Components/DataTable/Spinner'
 import { getCurrentOutlet } from '../../Validator'
 import { baseURL } from '../../../assets/auth/jwtService'
+import { PermissionProvider } from '../../../Helper/Context'
 
 const Offers = () => {
+    const { userPermission } = useContext(PermissionProvider)
     const [offerData, setOfferData] = useState({
         activeOffers: "",
         redemption: "",
@@ -67,7 +69,7 @@ const Offers = () => {
                     <CardCom
                         icon={<img src="https://cdn-icons-png.flaticon.com/512/1773/1773345.png" width="25px" />}
                         title="Total Revenue"
-                        data={offerData?.isOfferData ? `₹${offerData?.revenue}` : <Spinner size={'25px'} />}
+                        data={offerData?.isOfferData ? `${userPermission?.currencySymbol}${offerData?.revenue}` : <Spinner size={'25px'} />}
                         info={`Total earnings`}
                     />
                 </div>
